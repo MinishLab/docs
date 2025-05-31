@@ -2,38 +2,46 @@
 mode: wide
 ---
 
-<div
-  style={{
-    display: 'flex',
-    justifyContent: 'center',
-    marginBottom: '32px'
-  }}
->
+{/* Reduce the gap above by applying a negative top‐margin */}
+<div style={{ marginTop: '-14rem' }}>
   <div
     style={{
-      display: 'inline-flex',
-      flexDirection: 'column',
-      alignItems: 'center'
+      display: 'flex',
+      justifyContent: 'center',
+      marginBottom: '32px'
     }}
   >
-    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-      <h1 style={{ fontSize: '6rem', margin: 0 }}>Minish</h1>
-      <img
-        src="/logo/minish_logo.png"
-        alt="Minish Logo"
-        style={{ maxHeight: '120px' }}
-      />
-    </div>
-
-    <p
+    <div
       style={{
-        fontSize: '1.5rem',
-        color: 'var(--color-text-subtle)',
-        margin: '-40px 0 0 0'
+        display: 'inline-flex',
+        flexDirection: 'column',
+        alignItems: 'center'
       }}
     >
-      Solving big problems with small models
-    </p>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <h1
+          className="logo-font"
+          style={{ fontSize: '9rem', margin: 0 }}
+        >
+          Minish
+        </h1>
+        <img
+          src="/logo/minish_logo.png"
+          alt="Minish Logo"
+          style={{ maxHeight: '180px' }}
+        />
+      </div>
+
+      <p
+        style={{
+          fontSize: '2rem',
+          color: 'var(--color-text-subtle)',
+          margin: '-200px 0 0 0'
+        }}
+      >
+        Solving big problems with small models
+      </p>
+    </div>
   </div>
 </div>
 

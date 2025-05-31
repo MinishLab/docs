@@ -4,10 +4,16 @@
   "name": "Minish Documentation",
   "colors": {
     "primary": "#16A34A",
-    "light": "#07C983",
+    "light": "#15803D",
     "dark": "#15803D"
   },
   "favicon": "/favicon.svg",
+  "background": {
+    "color": {
+      "light": "#e6e4da",
+      "dark": "#1a1a1a"
+    }
+  },
   "navigation": {
     "tabs": [
       {

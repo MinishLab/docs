@@ -1,0 +1,30 @@
+/* docs/assets/overrides.css */
+
+/* Make the top navbar use your desired green */
+#navbar {
+    background-color: #22975e !important;
+  }
+  
+  /* If you need to invert the link colors for readability */
+  #navbar .NavLink {
+    color: #f0efe8 !important; /* light/creme text on green background */
+  }
+  
+  /* On hover, maintain contrast */
+  #navbar .NavLink:hover,
+  #navbar .NavLink:focus {
+    background-color: rgba(240, 239, 232, 0.1) !important;
+    color: #ffffff !important;
+  }
+  
+
+  /* Import a cartoony Google Font (e.g., Bangers) */
+@import url('https://fonts.googleapis.com/css2?family=Bangers&display=swap');
+
+/* Create a class that uses that font */
+.logo-font {
+  font-family: 'Bangers', cursive;
+}
+
+
+
