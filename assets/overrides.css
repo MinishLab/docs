@@ -73,13 +73,31 @@
     z-index: 1000;              /* sit above everything else */
   }
   
-  /* 2) Enlarge each navbar link and give extra vertical padding */
-  #navbar a {
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Nosifer&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Bangers&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Sigmar+One&display=swap');
+/* Load Bungee */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+
+/* 2) Style all navbar links with Orbitron + white fill + black outline */
+#navbar a {
+    font-family: 'Orbitron', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 1.25rem !important;
+    padding: 0.75rem 1rem !important;
+    line-height: 1 !important;
     color: #ffffff !important;
-    font-size: 1.25rem !important;      /* bigger link text */
-    padding: 0.75rem 1rem !important;   /* taller click area */
-    line-height: 1 !important;          /* center text vertically */
-  }
+  
+    /* Thin black “border” via four directional shadows */
+    text-shadow:
+    1px  1px 0 #0f7040,
+   -1px  1px 0 #0f7040,
+    1px -1px 0 #0f7040,
+   -1px -1px 0 #0f7040;
+}
   
   /* 3) Push the main content down so it never sits under the fixed navbar */
   main {
