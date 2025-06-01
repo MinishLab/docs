@@ -2,56 +2,16 @@
 mode: wide
 ---
 
-{/* Reduce the gap above by applying a negative top‐margin */}
-<div style={{ marginTop: '-14rem' }}>
-  <div
-    style={{
-      display: 'flex',
-      justifyContent: 'center',
-      marginBottom: '32px'
-    }}
-  >
-    <div
-      style={{
-        display: 'inline-flex',
-        flexDirection: 'column',
-        alignItems: 'center'
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-        <h1
-          className="logo-font"
-          style={{ fontSize: '9rem', margin: 0 }}
-        >
-          Minish
-        </h1>
-        <img
-          src="/logo/minish_logo.png"
-          alt="Minish Logo"
-          style={{ maxHeight: '180px' }}
-        />
-      </div>
-
-      <p
-        style={{
-          fontSize: '2rem',
-          color: 'var(--color-text-subtle)',
-          margin: '-200px 0 0 0'
-        }}
-      >
-        Solving big problems with small models
-      </p>
-    </div>
-  </div>
-</div>
-
 # Packages
 
-Our packages. 
+Our packages.  
 <CardGroup cols={2}>
 
-  {/* ───────────────────────────── model2vec ───────────────────────────── */}
-  <Card href="/packages/model2vec/index">
+  {/* ────────────────────────────── model2vec ────────────────────────────── */}
+  <Card
+    href="/packages/model2vec/index"
+    className="custom-card"
+  >
     <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '12px' }}>
       <img
         src="/images/logos/model2vec_logo.png"
@@ -59,7 +19,6 @@ Our packages.
         style={{ maxHeight: '180px' }}
       />
     </div>
-
     <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center' }}>
       <a
         href="https://github.com/minishlab/model2vec"
@@ -95,7 +54,10 @@ Our packages.
   </Card>
 
   {/* ───────────────────────────── semhash ───────────────────────────── */}
-  <Card href="/packages/semhash/index">
+  <Card
+    href="/packages/semhash/index"
+    className="custom-card"
+  >
     <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '12px' }}>
       <img
         src="/images/logos/semhash_logo.png"
@@ -103,7 +65,6 @@ Our packages.
         style={{ maxHeight: '180px' }}
       />
     </div>
-
     <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center' }}>
       <a
         href="https://github.com/minishlab/semhash"
@@ -139,7 +100,10 @@ Our packages.
   </Card>
 
   {/* ───────────────────────────── vicinity ───────────────────────────── */}
-  <Card href="/packages/vicinity/index">
+  <Card
+    href="/packages/vicinity/index"
+    className="custom-card"
+  >
     <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '12px' }}>
       <img
         src="/images/logos/vicinity_logo.png"
@@ -147,7 +111,6 @@ Our packages.
         style={{ maxHeight: '180px' }}
       />
     </div>
-
     <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center' }}>
       <a
         href="https://github.com/minishlab/vicinity"
@@ -183,7 +146,10 @@ Our packages.
   </Card>
 
   {/* ───────────────────────────── tokenlearn ───────────────────────────── */}
-  <Card href="/packages/tokenlearn/index">
+  <Card
+    href="/packages/tokenlearn/index"
+    className="custom-card"
+  >
     <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '12px' }}>
       <img
         src="/images/logos/tokenlearn_logo.png"
@@ -191,7 +157,6 @@ Our packages.
         style={{ maxHeight: '180px' }}
       />
     </div>
-
     <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center' }}>
       <a
         href="https://github.com/minishlab/tokenlearn"
@@ -226,8 +191,11 @@ Our packages.
     </div>
   </Card>
 
-  {/* ──────────────────────── model2vec-rs (Rust) ─────────────────────── */}
-  <Card href="/packages/model2vec-rs/index">
+  {/* ────────────────────────── model2vec-rs (Rust) ───────────────────────── */}
+  <Card
+    href="/packages/model2vec-rs/index"
+    className="custom-card"
+  >
     <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '12px' }}>
       <img
         src="/images/logos/model2vec_rs_logo.png"
@@ -235,7 +203,6 @@ Our packages.
         style={{ maxHeight: '180px' }}
       />
     </div>
-
     <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center' }}>
       <a
         href="https://github.com/minishlab/model2vec-rs"
