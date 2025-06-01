@@ -67,14 +67,15 @@
     ]
   },
   "logo": {
-    "light": "/logo/minish_logo.png",
-    "dark": "/logo/minish_logo.png"
+    "light": "/logo/minish_logo_lighter.png",
+    "dark": "/logo/minish_logo_lighter.png"
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/minish",
-      "github": "https://github.com/minish",
-      "linkedin": "https://linkedin.com/company/minish"
+      "github": "https://github.com/minishlab",
+      "linkedin": "https://linkedin.com/company/minish-lab",
+      "x": "https://x.com/minishlab"
+
     }
   }
 }

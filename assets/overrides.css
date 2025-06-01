@@ -28,6 +28,30 @@
 
 
 
+
+
+/* Override every Card’s background and border */
+.card {
+    background-color: #22975e2c !important;         /* your light‐cream color */
+    border: 2px solid rgba(0, 0, 0, 0.05) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+  }
+  
+  /* Optionally, if you want a different look in dark mode: */
+  .theme-dark .card {
+    background-color: #2a2a2a !important;         /* dark gray (or whatever you prefer) */
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+  }
+  
+
+
+
+
+
+
+
+
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
 
 /* 2) Style all navbar links with Orbitron + white fill + black outline */
