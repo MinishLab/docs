@@ -1,6 +1,6 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
+  "theme": "willow",
   "name": "Minish Documentation",
   "colors": {
     "primary": "#16A34A",
@@ -31,13 +31,49 @@
         "tab": "Packages",
         "groups": [
           {
-            "group": "All Packages",
+            "group": "Model2Vec",
             "pages": [
               "packages/model2vec/index",
+              "packages/model2vec/installation",
+              "packages/model2vec/inference",
+              "packages/model2vec/distillation",
+              "packages/model2vec/training"
+            ]
+          },
+          {
+            "group": "SemHash",
+            "pages": [
               "packages/semhash/index",
+              "packages/semhash/introduction",
+              "packages/semhash/installation",
+              "packages/semhash/usage"
+            ]
+          },
+          {
+            "group": "Vicinity",
+            "pages": [
               "packages/vicinity/index",
+              "packages/vicinity/introduction",
+              "packages/vicinity/installation",
+              "packages/vicinity/usage"
+            ]
+          },
+          {
+            "group": "Tokenlearn",
+            "pages": [
               "packages/tokenlearn/index",
-              "packages/model2vec-rs/index"
+              "packages/tokenlearn/introduction",
+              "packages/tokenlearn/installation",
+              "packages/tokenlearn/usage"
+            ]
+          },
+          {
+            "group": "Model2Vec-rs",
+            "pages": [
+              "packages/model2vec-rs/index",
+              "packages/model2vec-rs/introduction",
+              "packages/model2vec-rs/installation",
+              "packages/model2vec-rs/usage"
             ]
           }
         ]
@@ -58,7 +94,7 @@
         "groups": [
           {
             "group": "About",
-            "pages":   [
+            "pages": [
               "about/index"
             ]
           }
@@ -75,7 +111,6 @@
       "github": "https://github.com/minishlab",
       "linkedin": "https://linkedin.com/company/minish-lab",
       "x": "https://x.com/minishlab"
-
     }
   }
 }
