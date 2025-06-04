@@ -200,3 +200,33 @@
 #content‐side‐layout {
     display: none !important;
   }
+
+
+
+
+
+
+.logo-font {
+font-family: 'Bangers' !important;
+    font-size: 6.5rem !important;
+    letter-spacing: 0.05em !important; /* Optional: add slight letter spacing */
+    /* add an underline effect */
+    text-decoration: underline !important;
+
+}
+
+
+
+
+
+/* ── Import the fonts you’ll need ── */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bangers&display=swap');
+:root {
+    /* “Inter” is Mintlify’s default for body text—replace it with Open Sans */
+    --font-inter: 'Bangers', sans-serif !important;
+}
+  
+html {
+    font-size: 18px !important;
+  }
