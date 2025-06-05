@@ -1,0 +1,230 @@
+/* ───── NAVBAR STYLING ───── */
+
+/* 1) Always force the solid green behind #navbar */
+/* #navbar {
+    background-color: #22975e !important;
+    backdrop-filter: none !important;
+    opacity: 1 !important;
+  }
+   */
+  /* 2) When Mintlify adds the “scrolled” class, keep it exactly the same green */
+  #navbar.scrolled {
+    background-color: #22975e !important;
+    backdrop-filter: none !important;
+    opacity: 1 !important;
+  }
+  
+  /* 3) Also disable any ::before / ::after blurs on both states */
+  #navbar::before,
+  #navbar::after,
+  #navbar.scrolled::before,
+  #navbar.scrolled::after {
+    backdrop-filter: none !important;
+    opacity: 1 !important;
+  }
+  
+  /* 4) Restyle all navbar links for white/outline look */
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+  #navbar a {
+    font-family: 'Orbitron', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 1.1rem !important;
+    line-height: 1 !important;
+    color: #e6e4da !important;
+    padding: 0.75rem 1rem !important;
+  }
+  
+  /* 5) Invert the default .NavLink color so it stays readable on green */
+  #navbar .NavLink {
+    color: #f0efe8 !important;
+  }
+  #navbar .NavLink:hover,
+  #navbar .NavLink:focus {
+    background-color: rgba(240, 239, 232, 0.1) !important;
+    color: #ffffff !important;
+  }
+  
+  /* 6) Bangers font for any .logo-font usage */
+  @import url('https://fonts.googleapis.com/css2?family=Bangers&display=swap');
+  .logo-font {
+    font-family: 'Bangers', cursive !important;
+  }
+  
+  /* ───── CARD STYLING ───── */
+  
+  .card {
+    background-color: #22975e2c !important; /* very-light-green */
+    border: 2px solid rgba(0, 0, 0, 0.05) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+  }
+  
+  /* In dark mode, make the same card background slightly darker */
+  .theme-dark .card {
+    background-color: rgba(34, 151, 94, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+  }
+  
+  /* ───── BLOGPOST STYLING ───── */
+  
+  /* Container for each post entry */
+  .blog-post {
+
+    margin-bottom: 2rem;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  /* Post Title (Orbitron + green) */
+  .blog-post .post-title {
+    font-family: 'Orbitron', sans-serif !important;
+    color: #22975e !important;
+    font-size: 2rem;
+    margin-bottom: 0.25rem;
+    text-transform: capitalize;
+  }
+  
+  /* Post Date (bold, black) */
+  .blog-post .post-date {
+    font-weight: bold;
+    margin: 0 0 1rem 0;
+    font-size: 1rem;
+  }
+  
+  /* “Read More” link styling */
+  .blog-post .read-more {
+    color: #22975e !important;
+    font-weight: bold !important;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    font-size: 0.95rem;
+  }
+  
+  /* Separator line between posts */
+  .blog-post + hr {
+    border: none;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    margin: 2rem 0;
+  }
+  
+  /* Hover effect on the “Read More” link */
+  .blog-post .read-more:hover {
+    text-decoration: underline;
+    color: #1a5b43 !important; /* slightly darker green on hover */
+  }
+  
+  /* ───── Dark-mode text overrides ───── */
+  
+  /* Make each post’s title white in dark mode */
+  body.theme-dark .blog-post .post-title {
+    color: #ffffff !important;
+  }
+  
+  /* Make the post date light gray in dark mode */
+  body.theme-dark .blog-post .post-date {
+    color: #e0e0e0 !important;
+  }
+  
+  /* Make the summary paragraph off-white in dark mode */
+  body.theme-dark .blog-post .post-summary {
+    color: #f0f0f0 !important;
+  }
+  
+  /* Make the “READ MORE” link white in dark mode */
+  body.theme-dark .blog-post .read-more {
+    color: #ffffff !important;
+  }
+  
+  /* Slightly dim the “READ MORE” on hover in dark mode */
+  body.theme-dark .blog-post .read-more:hover {
+    color: #e0e0e0 !important;
+  }
+  
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  /* ─── WIDEN MINTLIFY’S CONTENT AREA ─── */
+
+/* 1) Target the div with id="content-area" directly */
+#content-area {
+    max-width: 1100px !important;
+    width: 100% !important;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  /* 2) In case Mintlify adds other wrappers inside, allow them to stretch too */
+  #content-area > div {
+    max-width: 100% !important;
+  }
+  
+  /* 3) If there is a “.prose” or similar inner container limiting width, override it as well */
+  .prose {
+    max-width: none !important;
+  }
+  
+
+
+  /* ─── WIDEN MINTLIFY’S CONTENT AREA (APPLY TO BLOG TOO) ─── */
+  #content‐area {
+    /* wipe out Mintlify’s max‐w‐xl, xl:w-[calc(100%-28rem)]… */
+    max-width: 1100px   !important; /* or whatever “wide” you prefer */
+    width:     100%     !important;
+    margin-left:  auto;
+    margin-right: auto;
+  }
+  
+  /* In case Mintlify wraps additional <div>s inside #content‐area, let them break out too */
+  #content‐area > div {
+    max-width: none !important;
+  }
+  
+  /* Mintlify sometimes wraps MDX text in a .prose container that also has its own max‐width.
+     This line forces the prose to expand as well: */
+  .prose {
+    max-width: none !important;
+  }
+
+  /* Hide Mintlify’s built‐in Blog/Docs sidebar so that #content‐area can truly span the full width */
+#content‐side‐layout {
+    display: none !important;
+  }
+
+
+
+
+
+
+.logo-font {
+font-family: 'Bangers' !important;
+    font-size: 6.5rem !important;
+    letter-spacing: 0.05em !important; /* Optional: add slight letter spacing */
+    /* add an underline effect */
+    text-decoration: underline !important;
+
+}
+
+
+
+
+
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bangers&display=swap');
+:root {
+    --font-inter: 'Bangers', sans-serif !important;
+}
+  
+html {
+    font-size: 18px !important;
+  }

@@ -1,102 +1,106 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
-  "name": "Mint Starter Kit",
+  "theme": "willow",
+  "name": "Minish Documentation",
   "colors": {
     "primary": "#16A34A",
-    "light": "#07C983",
+    "light": "#15803D",
     "dark": "#15803D"
   },
-  "favicon": "/favicon.svg",
+  "favicon": "/logo/minish_logo.png",
+  "background": {
+    "color": {
+      "light": "#e6e4da",
+      "dark": "#1a1a1a"
+    }
+  },
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Home",
         "groups": [
           {
-            "group": "Get Started",
+            "group": "Home",
             "pages": [
-              "index",
-              "quickstart",
-              "development"
-            ]
-          },
-          {
-            "group": "Essentials",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/settings",
-              "essentials/navigation",
-              "essentials/reusable-snippets"
+              "index"
             ]
           }
         ]
       },
       {
-        "tab": "API Reference",
+        "tab": "Packages",
         "groups": [
           {
-            "group": "API Documentation",
+            "group": "Model2Vec",
             "pages": [
-              "api-reference/introduction"
+              "packages/model2vec/index",
+              "packages/model2vec/installation",
+              "packages/model2vec/inference",
+              "packages/model2vec/distillation",
+              "packages/model2vec/training",
+              "packages/model2vec/models",
+              "packages/model2vec/results"
             ]
           },
           {
-            "group": "Endpoint Examples",
+            "group": "SemHash",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "packages/semhash/index"
+            ]
+          },
+          {
+            "group": "Vicinity",
+            "pages": [
+              "packages/vicinity/index"
+            ]
+          },
+          {
+            "group": "Tokenlearn",
+            "pages": [
+              "packages/tokenlearn/index"
+            ]
+          },
+          {
+            "group": "Model2Vec-rs",
+            "pages": [
+              "packages/model2vec-rs/index"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Blog",
+        "groups": [
+          {
+            "group": "Blog",
+            "pages": [
+              "blog/index"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "About",
+        "groups": [
+          {
+            "group": "About",
+            "pages": [
+              "about/index"
             ]
           }
         ]
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Community",
-          "href": "https://mintlify.com/community",
-          "icon": "slack"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
+    ]
   },
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
-  },
-  "navbar": {
-    "links": [
-      {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
-      }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
-    }
+    "light": "/logo/minish_logo_lighter.png",
+    "dark": "/logo/minish_logo_lighter.png"
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "github": "https://github.com/minishlab",
+      "linkedin": "https://linkedin.com/company/minish-lab",
+      "x": "https://x.com/minishlab"
     }
   }
 }
