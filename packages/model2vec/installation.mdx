@@ -1,9 +1,31 @@
 ---
 title: "Installation"
 sidebarTitle: "Installation"
+description: "Install Model2Vec and its optional dependencies"
 icon: "download"
+mode: wide
 ---
 
-# Installation
+## Base Installation
+To install the base Model2Vec package, you can use the following command:
 
-How to install Model2Vec …
+```bash
+pip install model2vec
+```
+
+# Optional Dependencies
+Model2Vec has several optional dependencies that enhance its functionality. You can install these dependencies using the following commands:
+
+```bash
+# For distillation
+pip install model2vec[distill]
+
+# For classifier training
+pip install model2vec[train]
+
+# For classifier inference
+pip install model2vec[inference]
+
+# For onnx conversion
+pip install model2vec[onnx]
+```

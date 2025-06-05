@@ -37,43 +37,33 @@
               "packages/model2vec/installation",
               "packages/model2vec/inference",
               "packages/model2vec/distillation",
-              "packages/model2vec/training"
+              "packages/model2vec/training",
+              "packages/model2vec/models",
+              "packages/model2vec/results"
             ]
           },
           {
             "group": "SemHash",
             "pages": [
-              "packages/semhash/index",
-              "packages/semhash/introduction",
-              "packages/semhash/installation",
-              "packages/semhash/usage"
+              "packages/semhash/index"
             ]
           },
           {
             "group": "Vicinity",
             "pages": [
-              "packages/vicinity/index",
-              "packages/vicinity/introduction",
-              "packages/vicinity/installation",
-              "packages/vicinity/usage"
+              "packages/vicinity/index"
             ]
           },
           {
             "group": "Tokenlearn",
             "pages": [
-              "packages/tokenlearn/index",
-              "packages/tokenlearn/introduction",
-              "packages/tokenlearn/installation",
-              "packages/tokenlearn/usage"
+              "packages/tokenlearn/index"
             ]
           },
           {
             "group": "Model2Vec-rs",
             "pages": [
-              "packages/model2vec-rs/index",
-              "packages/model2vec-rs/introduction",
-              "packages/model2vec-rs/installation",
-              "packages/model2vec-rs/usage"
+              "packages/model2vec-rs/index"
             ]
           }
         ]

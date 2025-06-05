@@ -219,11 +219,9 @@ font-family: 'Bangers' !important;
 
 
 
-/* ── Import the fonts you’ll need ── */
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Bangers&display=swap');
 :root {
-    /* “Inter” is Mintlify’s default for body text—replace it with Open Sans */
     --font-inter: 'Bangers', sans-serif !important;
 }
   
