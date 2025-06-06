@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "willow",
-  "name": "Minish Documentation",
+  "name": "Minish Blog & Documentation",
   "colors": {
     "primary": "#16A34A",
     "light": "#15803D",

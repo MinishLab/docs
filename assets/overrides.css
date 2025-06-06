@@ -58,12 +58,17 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
   }
   
-  /* In dark mode, make the same card background slightly darker */
-  .theme-dark .card {
-    background-color: rgba(34, 151, 94, 0.15) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+  
+
+
+  
+  /* override only when <html class="dark"> is present */
+html.dark .card {
+    background-color: rgba(0, 149, 25, 0.171) !important;   /* darker wash */
+    border: 1px solid rgba(255, 255, 255, 0.214) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.30) !important;
   }
+
   
   /* ───── BLOGPOST STYLING ───── */
   
@@ -203,18 +208,54 @@
 
 
 
-
-
-
+/* ─── LOGO FONT OVERRIDE ─── */
 .logo-font {
 font-family: 'Bangers' !important;
-    font-size: 6.5rem !important;
+    font-size: clamp(5rem, 8vw + 1rem, 6.5rem); /* min - fluid - max */
     letter-spacing: 0.05em !important; /* Optional: add slight letter spacing */
     /* add an underline effect */
-    text-decoration: underline !important;
 
 }
+/* ---------- desktop / default ---------- */
+.logo-font {
+    margin-top: -5.5rem;   /* roughly what you had (-2 em) */
+  }
+  
+  /* ---------- phones & small tablets ---------- */
+  @media (max-width: 640px) {       /* tweak the breakpoint if you like */
+    .logo-font {
+        text-align: center !important; 
+      margin-top: -5.5rem;            /* lift it a little higher */
+    }
+  }
 
+
+/* light-mode (html *without* .dark)  */
+html:not(.dark) .logo-font {
+    color: #0b0b0bbe;        /* green */
+    
+  }
+  
+  /* dark-mode (html *with* .dark) */
+  html.dark .logo-font {
+    color: #e6e4da;        /* your light-on-dark tint */
+  }
+  
+
+/* ─── HERO TAGLINE STYLING ─── */
+/* ---------- desktop / default ---------- */
+.hero-tagline {
+    margin-top: -2em;          /* or trim it to -5em if it feels too tight */
+    font-size: 1.2rem;         /* 1.2 × the root (18 px) = 21.6 px */
+    line-height: 1.4;
+  }
+  
+  /* phones and small tablets */
+  @media (max-width: 640px) {
+    .hero-tagline {
+      margin-top: -1em;        /* pull it up, but only ~65 px instead of 150 px */
+    }
+  }
 
 
 
@@ -228,3 +269,76 @@ font-family: 'Bangers' !important;
 html {
     font-size: 18px !important;
   }
+
+
+
+
+
+
+
+
+/* ─── VIGNETTE OVERLAY ─── */
+
+/* 1) We only want to show it in dark mode */
+html.dark::before,
+html[data-theme="dark"]::before {
+  /* absolutely cover the entire viewport */
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;       /* so you can still click links normally */
+  z-index: -1;                /* sit behind everything else */
+
+  /* 2) radial gradient: 
+     - center is fully transparent
+     - edges fade to a very subtle near-black (rgba(0,0,0,0.6) is plenty)
+     You can tweak the color stops/distance if you want a stronger or weaker effect. */
+  background: radial-gradient(
+    circle at center,
+    rgba(0, 0, 0, 0)   50%,    /* 50% of the radius—still transparent */
+    rgba(0, 0, 0, 0.6) 100%    /* near-black by the time you hit the edge */
+  );
+}
+
+/* 3) Make sure that the plain dark‐background color still sits underneath.
+   We do this by re-stating your original dark page background 
+   directly on html.dark (so the gradient is laid on top of #1a1a1a). */
+html.dark {
+  background-color: #1a1a1a !important;
+}
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.cta-row {
+    display: flex;
+    flex-wrap: wrap;      /* if you want them to stack on very small screens */
+    gap: 2rem;            /* ← controls the exact space between the two links */
+    margin-top: 1rem;     /* optional: push the row down a bit */
+    margin-bottom: 1rem;
+  }
+  
+  /* (optional) if you want them to stack on mobile: */
+  @media (max-width: 500px) {
+    .cta-row {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+  }
+  
