@@ -40,7 +40,7 @@
           {
             "group": "Model2Vec",
             "pages": [
-              "packages/model2vec/index",
+              "packages/model2vec/introduction",
               "packages/model2vec/installation",
               "packages/model2vec/inference",
               "packages/model2vec/distillation",
@@ -52,25 +52,25 @@
           {
             "group": "SemHash",
             "pages": [
-              "packages/semhash/index"
+              "packages/semhash/introduction"
             ]
           },
           {
             "group": "Vicinity",
             "pages": [
-              "packages/vicinity/index"
+              "packages/vicinity/introduction"
             ]
           },
           {
             "group": "Tokenlearn",
             "pages": [
-              "packages/tokenlearn/index"
+              "packages/tokenlearn/introduction"
             ]
           },
           {
             "group": "Model2Vec-rs",
             "pages": [
-              "packages/model2vec-rs/index"
+              "packages/model2vec-rs/introduction"
             ]
           }
         ]
