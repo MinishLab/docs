@@ -331,6 +331,7 @@ html.dark {
     flex-wrap: wrap;      /* if you want them to stack on very small screens */
     gap: 2rem;            /* ← controls the exact space between the two links */
     margin-top: 1rem;     /* optional: push the row down a bit */
+    margin-bottom: 1rem;
   }
   
   /* (optional) if you want them to stack on mobile: */
