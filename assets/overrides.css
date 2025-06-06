@@ -58,12 +58,17 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
   }
   
-  /* In dark mode, make the same card background slightly darker */
-  .theme-dark .card {
-    background-color: rgba(34, 151, 94, 0.15) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+  
+
+
+  
+  /* override only when <html class="dark"> is present */
+html.dark .card {
+    background-color: rgba(0, 149, 25, 0.171) !important;   /* darker wash */
+    border: 1px solid rgba(255, 255, 255, 0.214) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.30) !important;
   }
+
   
   /* ───── BLOGPOST STYLING ───── */
   
@@ -203,18 +208,54 @@
 
 
 
-
-
-
+/* ─── LOGO FONT OVERRIDE ─── */
 .logo-font {
 font-family: 'Bangers' !important;
-    font-size: 6.5rem !important;
+    font-size: clamp(5rem, 8vw + 1rem, 6.5rem); /* min - fluid - max */
     letter-spacing: 0.05em !important; /* Optional: add slight letter spacing */
     /* add an underline effect */
     text-decoration: underline !important;
 
 }
+/* ---------- desktop / default ---------- */
+.logo-font {
+    margin-top: -5.5rem;   /* roughly what you had (-2 em) */
+  }
+  
+  /* ---------- phones & small tablets ---------- */
+  @media (max-width: 640px) {       /* tweak the breakpoint if you like */
+    .logo-font {
+        text-align: center !important; 
+      margin-top: -5.5rem;            /* lift it a little higher */
+    }
+  }
 
+
+/* light-mode (html *without* .dark)  */
+html:not(.dark) .logo-font {
+    color: #0b0b0bbe;        /* green */
+  }
+  
+  /* dark-mode (html *with* .dark) */
+  html.dark .logo-font {
+    color: #e6e4daad;        /* your light-on-dark tint */
+  }
+  
+
+/* ─── HERO TAGLINE STYLING ─── */
+/* ---------- desktop / default ---------- */
+.hero-tagline {
+    margin-top: -2em;          /* or trim it to -5em if it feels too tight */
+    font-size: 1.2rem;         /* 1.2 × the root (18 px) = 21.6 px */
+    line-height: 1.4;
+  }
+  
+  /* phones and small tablets */
+  @media (max-width: 640px) {
+    .hero-tagline {
+      margin-top: -1em;        /* pull it up, but only ~65 px instead of 150 px */
+    }
+  }
 
 
 
@@ -228,3 +269,13 @@ font-family: 'Bangers' !important;
 html {
     font-size: 18px !important;
   }
+
+
+
+
+
+
+
+
+
+  
