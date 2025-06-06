@@ -3,6 +3,77 @@ title: Training
 description: Train your own lightweight classification models with Model2Vec
 sidebarTitle: Training
 icon: "brain"
-mode: "wide"
 ---
 
+## Installation
+
+To train, make sure you install the training extra:
+
+```bash
+pip install model2vec[training]
+```
+
+## Training a Classifier
+
+Model2Vec supports training simple classifiers on top of static models. These models are extremely lightweight and can be trained on a CPU. 
+
+### Initializing a Classifier
+To initialize a classifier, you can use the `Classifier` class. This class allows you to create a lightweight model that can be trained on your data. We support both single- and multi-label classification, which work seamlessly based on the labels you provide.
+
+
+```python
+from model2vec.distill import distill
+from model2vec.train import StaticModelForClassification
+
+# From a distilled model
+distilled_model = distill("baai/bge-base-en-v1.5")
+classifier = StaticModelForClassification.from_static_model(model=distilled_model)
+
+# From a pre-trained model: potion is the default
+classifier = StaticModelForClassification.from_pretrained(model_name="minishlab/potion-base-32m")
+```
+
+### Load a Dataset
+Next, load a dataset to train on. 
+```python
+from datasets import load_dataset
+
+# Load the train and test splits of the dataset
+train, test = load_dataset("setfit/subj", split=["train", "test"])
+
+# Create X and y
+X_train, y_train = train["text"], train["label"]
+X_test, y_test   = test["text"], test["label"]
+```
+
+### Training and Evaluating the Classifier
+
+```python
+# Train the classifier
+classifier = classifier.fit(X_train, y_train)
+
+# Evaluate the classifier
+results = classifier.evaluate(X_test, y_test)
+```
+
+## Persistence
+
+You can easily turn a trained classifier into a scikit-learn compatible pipeline and save it locally, or push it to the HuggingFace Hub:
+
+```python
+pipeline = classifier.to_pipeline()
+
+pipeline.save_pretrained(path)
+pipeline.push_to_hub("my_org/my_classifier")
+```
+
+Then, you can load it back with:
+
+```python
+from model2vec.inference import StaticModelPipeline
+
+pipeline = StaticModelPipeline.from_pretrained("my_org/my_classifier")
+```
+
+Note that, since the converted pipeline is a scikit-learn pipeline, you don't need Torch anymore for inference.
+This allows you to deploy your model in a lightweight environment without the need for heavy dependencies.

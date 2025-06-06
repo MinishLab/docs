@@ -3,37 +3,73 @@ title: Inference
 description: Create embeddings with Model2Vec
 sidebarTitle: Inference
 icon: "bolt"
-head:
-  - style: |
-      /* ─────────────────────────────────────────────── */
-      /* Override #content-area to 800px for this docs page */
-      #content-area {
-        max-width: 800px !important;
-        width: 100% !important;
-        margin-left: auto !important;
-        margin-right: auto !important;
-      }
-      #content-area > div {
-        max-width: 100% !important;
-      }
-      .prose {
-        max-width: none !important;
-      }
-      /* ─────────────────────────────────────────────── */
 ---
 
 ## Loading a Model
+
+To load a pre-trained model, you can use the `Model2Vec.from_pretrained` method. This method allows you to load models from the Hugging Face Hub or from a local path. Here’s how to do it:
 ```python
 from model2vec import Model2Vec
 
 model = Model2Vec.from_pretrained("minishlab/potion-base-8M")
 ```
 
+<Accordion title="Parameters">
+
+    <ParamField
+        path="path"
+        type="PathLike"
+    >
+        The path to load your static model from.
+    </ParamField>
+
+    <ParamField
+        path="token"
+        type="str | None"
+        default="None"
+    >
+        The Hugging Face token to use when loading a private model. If not provided, no token is used.
+    </ParamField>
+
+    <ParamField
+        path="normalize"
+        type="bool | None"
+        default="None"
+    >
+        Whether to normalize the embeddings after loading. If `True`, embeddings will be normalized; if `False`, they won’t. If `None`, the model’s default behavior applies.
+    </ParamField>
+
+    <ParamField
+        path="subfolder"
+        type="str | None"
+        default="None"
+    >
+        The subfolder within the repository or local directory to load the model from. Leave as `None` to load from the root.
+    </ParamField>
+
+    <ParamField
+        path="quantize_to"
+        type="str | DType | None"
+        default="None"
+    >
+        The data type to quantize the model to (e.g., `"float16"` or a `torch.dtype`). If a string is passed, it’s converted to the corresponding `DType`. Set to `None` for no quantization.
+    </ParamField>
+
+    <ParamField
+        path="dimensionality"
+        type="int | None"
+        default="None"
+    >
+        The dimensionality to load the model at. If `None`, uses the model’s inherent dimensionality. Useful when loading a model with reduced dimensions (e.g., trained via PCA or MRL).
+    </ParamField>
+
+</Accordion>
 
 
 
 ## Creating Mean Embeddings
 
+To create mean embeddings, you can use the `encode` method of the `Model2Vec` class. This method allows you to encode a list of sentences into mean embeddings. Here’s an example:
 ```python
 from model2vec import Model2Vec
 
@@ -41,65 +77,66 @@ model = Model2Vec.from_pretrained("minishlab/potion-base-8M")
 embeddings = model.encode(["Hello world", "Static embeddings are great!"])
 ```
 
-## Parameters
 
-<ParamField
-    path="sentences"
-    type="Sequence[str]"
->
-    The list of sentences to encode. You can also pass a single sentence.
-</ParamField>
+<Accordion title="Parameters">
 
-<ParamField
-    path="show_progress_bar"
-    type="bool"
-    default="False"
->
-    Whether to show the progress bar.
-</ParamField>
+    <ParamField
+        path="sentences"
+        type="Sequence[str]"
+    >
+        The list of sentences to encode. You can also pass a single sentence.
+    </ParamField>
 
-<ParamField
-    path="max_length"
-    type="int | None"
-    default="512"
->
-    The maximum length of the sentences. Any tokens beyond this length will be truncated. If this is None, no truncation is done.
-</ParamField>
+    <ParamField
+        path="show_progress_bar"
+        type="bool"
+        default="False"
+    >
+        Whether to show the progress bar.
+    </ParamField>
 
-<ParamField
-    path="batch_size"
-    type="int"
-    default="1024"
->
-    The batch size to use.
-</ParamField>
+    <ParamField
+        path="max_length"
+        type="int | None"
+        default="512"
+    >
+        The maximum length of the sentences. Any tokens beyond this length will be truncated. If this is None, no truncation is done.
+    </ParamField>
 
-<ParamField
-    path="use_multiprocessing"
-    type="bool"
-    default="True"
->
-    Whether to use multiprocessing. By default, this is enabled for inputs &gt; multiprocessing_threshold sentences and disabled otherwise.
-</ParamField>
+    <ParamField
+        path="batch_size"
+        type="int"
+        default="1024"
+    >
+        The batch size to use.
+    </ParamField>
 
-<ParamField
-    path="multiprocessing_threshold"
-    type="int"
-    default="10000"
->
-    The threshold in number of sentences for using multiprocessing.
-</ParamField>
+    <ParamField
+        path="use_multiprocessing"
+        type="bool"
+        default="True"
+    >
+        Whether to use multiprocessing. By default, this is enabled for inputs &gt; multiprocessing_threshold sentences and disabled otherwise.
+    </ParamField>
 
-<ParamField
-    path="kwargs"
-    type="Any"
->
-    Any additional arguments. These are ignored.
-</ParamField>
+    <ParamField
+        path="multiprocessing_threshold"
+        type="int"
+        default="10000"
+    >
+        The threshold in number of sentences for using multiprocessing.
+    </ParamField>
 
+    <ParamField
+        path="kwargs"
+        type="Any"
+    >
+        Any additional arguments. These are ignored.
+    </ParamField>
+</Accordion>
 
 ## Creating Sequence Embeddings
-To create sequence embeddings, you can use the `model2vec` package as well. Here's an example:
+To create sequence embeddings, you can use the `encode_as_sequence` method of the `Model2Vec` class. This method allows you to encode a list of sentences into sequence embeddings, which are useful for tasks where you need a single embedding per token. Here’s an example:
 
 ```python
 from model2vec import Model2Vec
@@ -107,3 +144,60 @@ model = Model2Vec.from_pretrained("minishlab/potion-base-8M")
 embeddings = model.encode_as_sequence(["Hello world", "Static embeddings are great!"], mode="sequence")
 ```
 
+
+<Accordion title="Parameters">
+
+    <ParamField
+        path="sentences"
+        type="Sequence[str]"
+    >
+        The list of sentences to encode. You can also pass a single sentence.
+    </ParamField>
+
+    <ParamField
+        path="show_progress_bar"
+        type="bool"
+        default="False"
+    >
+        Whether to show the progress bar.
+    </ParamField>
+
+    <ParamField
+        path="max_length"
+        type="int | None"
+        default="512"
+    >
+        The maximum length of the sentences. Any tokens beyond this length will be truncated. If this is None, no truncation is done.
+    </ParamField>
+
+    <ParamField
+        path="batch_size"
+        type="int"
+        default="1024"
+    >
+        The batch size to use.
+    </ParamField>
+
+    <ParamField
+        path="use_multiprocessing"
+        type="bool"
+        default="True"
+    >
+        Whether to use multiprocessing. By default, this is enabled for inputs &gt; multiprocessing_threshold sentences and disabled otherwise.
+    </ParamField>
+
+    <ParamField
+        path="multiprocessing_threshold"
+        type="int"
+        default="10000"
+    >
+        The threshold in number of sentences for using multiprocessing.
+    </ParamField>
+
+    <ParamField
+        path="kwargs"
+        type="Any"
+    >
+        Any additional arguments. These are ignored.
+    </ParamField>
+</Accordion>

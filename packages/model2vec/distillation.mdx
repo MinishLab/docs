@@ -3,6 +3,108 @@ title: Distillation
 description: Distill your own models with Model2Vec
 sidebarTitle: Distillation
 icon: "flask"
-mode: "wide"
 ---
 
+## Installation
+
+To distill, make sure you install the distill extra:
+
+```bash
+pip install model2vec[distill]
+```
+
+
+## Distilling a Model from a Sentence Transformer
+To distill a model from a Sentence Transformer, you can use the `distill` function. This function allows you to create a lightweight static model from any Sentence Transformer. This can be done on a CPU in a few minutes.
+
+```python
+from model2vec.distill import distill
+
+# Distill a Sentence Transformer model
+m2v_model = distill(model_name="BAAI/bge-base-en-v1.5")
+
+# Save the model
+m2v_model.save_pretrained("m2v_model")
+```
+
+<Accordion title="Parameters">
+<ParamField
+    path="model_name"
+    type="str"
+>
+    The model name to use. Any SentenceTransformer-compatible model works.
+</ParamField>
+
+<ParamField
+    path="vocabulary"
+    type="list[str] | None"
+    default="None"
+>
+    The vocabulary to use. If `None`, uses the model’s built-in vocabulary.
+</ParamField>
+
+<ParamField
+    path="device"
+    type="str | None"
+    default="None"
+>
+    The device on which to run distillation (e.g., `"cpu"`, `"cuda"`). If `None`, defaults to the library’s device selection logic.
+</ParamField>
+
+<ParamField
+    path="pca_dims"
+    type="PCADimType"
+    default="256"
+>
+    The number of PCA components to retain. If `None`, PCA is skipped; if `"auto"`, we still apply PCA without reducing dimensionality.
+</ParamField>
+
+<ParamField
+    path="apply_zipf"
+    type="bool | None"
+    default="None"
+>
+    **Deprecated.** Used to control whether Zipf weighting is applied. Now controlled via `sif_coefficient`. If `None`, no Zipf weighting is applied.
+</ParamField>
+
+<ParamField
+    path="sif_coefficient"
+    type="float | None"
+    default="1e-4"
+>
+    The SIF coefficient to use for weighting. Must be ≥ 0 and < 1. If `None`, no weighting is applied.
+</ParamField>
+
+<ParamField
+    path="token_remove_pattern"
+    type="str | None"
+    default="\\[unused\\d+\\]"
+>
+    A regex pattern. Tokens matching this pattern will be removed from the vocabulary before distillation.
+</ParamField>
+
+<ParamField
+    path="trust_remote_code"
+    type="bool"
+    default="False"
+>
+    Whether to trust remote code when loading components. If `False`, only components from `transformers` are loaded; if `True`, all remote code is trusted.
+</ParamField>
+
+<ParamField
+    path="quantize_to"
+    type="DType | str"
+    default="DType.Float16"
+>
+    The data type to quantize the distilled model to (e.g., `DType.Float16` or its string equivalent). Defaults to float16 quantization.
+</ParamField>
+
+<ParamField
+    path="use_subword"
+    type="bool | None"
+    default="None"
+>
+    **Deprecated.** If not `None`, a warning is shown. Does not affect current behavior.
+</ParamField>
+
+</Accordion>
