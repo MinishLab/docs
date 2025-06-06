@@ -33,7 +33,7 @@
           {
             "group": "Overview",
             "pages": [
-              "packages/index"       
+              "packages/overview/index"       
               
             ]
           },
