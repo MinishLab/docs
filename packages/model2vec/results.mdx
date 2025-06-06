@@ -3,7 +3,6 @@ title: Results
 sidebarTitle: Results
 description: The results of Model2Vec on MTEB and training results
 icon: "chart-line"
-mode: "wide"
 ---
 
 The results of Model2Vec are presented in the following sections:
@@ -58,7 +57,7 @@ NOTE: for fairness of comparison, we disabled multiprocessing for Model2Vec for 
 |*Figure: The average MTEB score plotted against sentences per second. The circle size indicates model size.*|
 
 
-### MMTEB Results (Multilingual)
+## MMTEB Results (Multilingual)
 The results for the multilingual models are shown in the table below. We compare against the [LaBSE](https://huggingface.co/sentence-transformers/LaBSE) model, as well as other multilingual static embedding models.
 
 | Model                                     | Mean (Task) | Mean (TaskType) | BitMining | Class | Clust | InstRet | MultiClass | PairClass | Rank | Ret | STS       |
@@ -88,7 +87,7 @@ For readability, the MMTEB task names are abbreviated as follows:
 
 </details>
 
-### Retrieval Results
+## Retrieval Results
 
 A subset of models we created and compare against are specifically designed for retrieval tasks. The results are shown in the table below, including two general-purpose models for comparison and a transformer.
 

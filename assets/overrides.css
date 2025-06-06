@@ -163,7 +163,7 @@ html.dark .card {
 
 /* 1) Target the div with id="content-area" directly */
 #content-area {
-    max-width: 1100px !important;
+    /*max-width: 1100px !important;*/
     width: 100% !important;
     margin-left: auto;
     margin-right: auto;
@@ -180,26 +180,6 @@ html.dark .card {
   }
   
 
-
-  /* ─── WIDEN MINTLIFY’S CONTENT AREA (APPLY TO BLOG TOO) ─── */
-  #content‐area {
-    /* wipe out Mintlify’s max‐w‐xl, xl:w-[calc(100%-28rem)]… */
-    max-width: 1100px   !important; /* or whatever “wide” you prefer */
-    width:     100%     !important;
-    margin-left:  auto;
-    margin-right: auto;
-  }
-  
-  /* In case Mintlify wraps additional <div>s inside #content‐area, let them break out too */
-  #content‐area > div {
-    max-width: none !important;
-  }
-  
-  /* Mintlify sometimes wraps MDX text in a .prose container that also has its own max‐width.
-     This line forces the prose to expand as well: */
-  .prose {
-    max-width: none !important;
-  }
 
   /* Hide Mintlify’s built‐in Blog/Docs sidebar so that #content‐area can truly span the full width */
 #content‐side‐layout {
@@ -342,3 +322,7 @@ html.dark {
     }
   }
   
+
+
+
+
