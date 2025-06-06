@@ -3,6 +3,107 @@ title: Inference
 description: Create embeddings with Model2Vec
 sidebarTitle: Inference
 icon: "bolt"
-mode: "wide"
+head:
+  - style: |
+      /* ─────────────────────────────────────────────── */
+      /* Override #content-area to 800px for this docs page */
+      #content-area {
+        max-width: 800px !important;
+        width: 100% !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+      }
+      #content-area > div {
+        max-width: 100% !important;
+      }
+      .prose {
+        max-width: none !important;
+      }
+      /* ─────────────────────────────────────────────── */
 ---
+
+## Loading a Model
+```python
+from model2vec import Model2Vec
+
+model = Model2Vec.from_pretrained("minishlab/potion-base-8M")
+```
+
+
+
+
+## Creating Mean Embeddings
+
+```python
+from model2vec import Model2Vec
+
+model = Model2Vec.from_pretrained("minishlab/potion-base-8M")
+embeddings = model.encode(["Hello world", "Static embeddings are great!"])
+```
+
+## Parameters
+
+<ParamField
+    path="sentences"
+    type="Sequence[str]"
+>
+    The list of sentences to encode. You can also pass a single sentence.
+</ParamField>
+
+<ParamField
+    path="show_progress_bar"
+    type="bool"
+    default="False"
+>
+    Whether to show the progress bar.
+</ParamField>
+
+<ParamField
+    path="max_length"
+    type="int | None"
+    default="512"
+>
+    The maximum length of the sentences. Any tokens beyond this length will be truncated. If this is None, no truncation is done.
+</ParamField>
+
+<ParamField
+    path="batch_size"
+    type="int"
+    default="1024"
+>
+    The batch size to use.
+</ParamField>
+
+<ParamField
+    path="use_multiprocessing"
+    type="bool"
+    default="True"
+>
+    Whether to use multiprocessing. By default, this is enabled for inputs &gt; multiprocessing_threshold sentences and disabled otherwise.
+</ParamField>
+
+<ParamField
+    path="multiprocessing_threshold"
+    type="int"
+    default="10000"
+>
+    The threshold in number of sentences for using multiprocessing.
+</ParamField>
+
+<ParamField
+    path="kwargs"
+    type="Any"
+>
+    Any additional arguments. These are ignored.
+</ParamField>
+
+
+## Creating Sequence Embeddings
+To create sequence embeddings, you can use the `model2vec` package as well. Here's an example:
+
+```python
+from model2vec import Model2Vec
+model = Model2Vec.from_pretrained("minishlab/potion-base-8M")
+embeddings = model.encode_as_sequence(["Hello world", "Static embeddings are great!"], mode="sequence")
+```
 
