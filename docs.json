@@ -52,7 +52,12 @@
           {
             "group": "SemHash",
             "pages": [
-              "packages/semhash/introduction"
+              "packages/semhash/introduction",
+              "packages/semhash/installation",
+              "packages/semhash/deduplication",
+              "packages/semhash/outlier-filtering",
+              "packages/semhash/representative-sampling",
+              "packages/semhash/benchmarks"
             ]
           },
           {

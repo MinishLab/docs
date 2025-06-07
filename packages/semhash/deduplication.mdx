@@ -1,0 +1,13 @@
+---
+title: "Semantic Deduplication"
+sidebarTitle: "Semantic Deduplication"
+description: "Deduplicate datasets with SemHash"
+icon: "broom"
+---
+
+SemHash can be used to efficiently deduplicate datasets based on semantic similarity.
+This allows you to not only remove exact duplicates and near-duplicates, but also samples that are semantically similar, unlike methods like MinHash, which only consider matches that share exact n-grams.
+
+This is particularly useful for cleaning up datasets where you want to ensure that similar entries are not counted multiple times, such as in training datasets for machine learning models, or a RAG application where you want to avoid redundancy in your knowledge base.
+
+## Deduplicate a Single Dataset
