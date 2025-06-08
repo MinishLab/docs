@@ -72,13 +72,13 @@
           {
             "group": "Tokenlearn",
             "pages": [
-              "packages/tokenlearn/introduction"
+              "packages/tokenlearn/usage"
             ]
           },
           {
             "group": "Model2Vec-rs",
             "pages": [
-              "packages/model2vec-rs/introduction"
+              "packages/model2vec-rs/usage"
             ]
           }
         ]
