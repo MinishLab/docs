@@ -3,7 +3,49 @@ title: Vicinity
 description: Lightweight Nearest Neighbors with Flexible Backends
 sidebarTitle: Introduction
 icon: "book"
-mode: "wide"
 ---
 
-# Documentation in progress 🚧
+[Vicinity](https://github.com/MinishLab/vicinity) is a light-weight, low-dependency vector store. It provides a simple and intuitive interface for nearest neighbor search, with support for different backends and evaluation.
+
+There are many nearest neighbors packages and methods out there. However, we found it difficult to compare them. Every package has its own interface, quirks, and limitations, and learning a new package can be time-consuming. In addition to that, how do you effectively evaluate different packages? How do you know which one is the best for your use case?
+
+This is where Vicinity comes in. Instead of learning a new interface for each new package or backend, Vicinity provides a unified interface for all backends. This allows you to easily experiment with different indexing methods and distance metrics and choose the best one for your use case. Vicinity also provides a simple way to evaluate the performance of different backends, allowing you to measure the queries per second and recall.
+
+## Quick Start
+To install Vicinity, you can use the following command:
+
+```bash
+pip install vicinity
+```
+
+Then, you can use it like this:
+
+```python
+import numpy as np
+from vicinity import Vicinity, Backend, Metric
+
+# Create some dummy data as strings or other serializable objects
+items = ["triforce", "master sword", "hylian shield", "boomerang", "hookshot"]
+vectors = np.random.rand(len(items), 128)
+
+# Initialize the Vicinity instance (using the basic backend and cosine metric)
+vicinity = Vicinity.from_vectors_and_items(
+    vectors=vectors,
+    items=items,
+    backend_type=Backend.BASIC,
+    metric=Metric.COSINE
+)
+
+# Create a query vector
+query_vector = np.random.rand(128)
+
+# Query for nearest neighbors with a top-k search
+results = vicinity.query(query_vector, k=3)
+
+# Query for nearest neighbors with a threshold search
+results = vicinity.query_threshold(query_vector, threshold=0.9)
+
+# Query with a list of query vectors
+query_vectors = np.random.rand(5, 128)
+results = vicinity.query(query_vectors, k=3)
+```

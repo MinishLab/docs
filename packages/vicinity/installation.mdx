@@ -1,0 +1,39 @@
+---
+title: "Installation"
+sidebarTitle: "Installation"
+description: "Install Vicinity and its optional dependencies"
+icon: "download"
+---
+
+## Base Installation
+To install the base Vicinity package, you can use the following command:
+
+```bash
+pip install vicinity
+```
+
+## Optional Dependencies
+The base Vicinity is extremely lightweight. Idoes not include any ANN backends, and provides a simple flat index for exact nearest neighbor search. To use Vicinity with different backends, you can install the optional dependencies:
+
+```bash
+# Install all integrations and backends
+pip install vicinity[all]
+
+# Install all backends
+pip install vicinity[backends]
+
+# Install specific backends
+pip install vicinity[annoy]
+pip install vicinity[faiss]
+pip install vicinity[hnsw]
+pip install vicinity[pynndescent]
+pip install vicinity[usearch]
+pip install vicinity[voyager]
+
+# Install all integrations
+pip install vicinity[integrations]
+
+# Install specific integrations
+pip install vicinity[huggingface]
+
+```

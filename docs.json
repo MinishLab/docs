@@ -63,7 +63,10 @@
           {
             "group": "Vicinity",
             "pages": [
-              "packages/vicinity/introduction"
+              "packages/vicinity/introduction",
+              "packages/vicinity/installation",
+              "packages/vicinity/usage",
+              "packages/vicinity/supported-backends"
             ]
           },
           {
