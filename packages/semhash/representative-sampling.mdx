@@ -1,0 +1,127 @@
+---
+title: "Representative Sampling"
+sidebarTitle: "Representative Sampling"
+description: "Find representative samples with SemHash"
+icon: "grid"
+---
+
+SemHash provides a simple interface for representative sampling, which is useful for selecting a subset of data that best represents the entire dataset.
+This can be particularly useful in scenarios where you want to reduce the size of your dataset while retaining its diversity.
+
+This works by first selecting samples that have the *highest average similarity* to other samples in the dataset (the most "central" samples),
+and then iteratively selecting samples that are most dissimilar to the already selected ones with that set using *maximum marginal relevance (MMR)*.
+
+## Representative Sampling from a Single Dataset
+To perform representative sampling from a single dataset, you can use the `self_find_representative` method. This method will select a subset of samples that best represent the entire dataset based on their semantic similarity.
+
+```python
+from datasets import load_dataset
+from semhash import SemHash
+
+# Load a dataset to filter
+texts = load_dataset("ag_news", split="train")["text"]
+
+# Initialize a SemHash instance
+semhash = SemHash.from_records(records=texts)
+
+# Find representative samples from the texts
+representative_texts = semhash.self_find_representative().selected
+```
+
+
+<Accordion title="Parameters">
+
+    <ParamField
+        path="selection_size"
+        type="int"
+        default="10"
+    >
+        Number of representatives to select.
+    </ParamField>
+
+    <ParamField
+        path="candidate_limit"
+        type="int | Literal['auto']"
+        default="auto"
+    >
+        Number of top candidates to consider for MMR reranking. Defaults to "auto", which calculates the limit based on the total number of records.
+    </ParamField>
+
+    <ParamField
+        path="lambda_param"
+        type="float"
+        default="0.5"
+    >
+        Trade-off parameter between relevance (1.0) and diversity (0.0). Must be between 0 and 1.
+    </ParamField>
+
+</Accordion>
+
+## Representative Sampling Across Multiple Datasets
+To perform representative sampling across multiple datasets, you can use the `find_representative` method. This method allows you to select a subset of samples from one dataset that best represents another dataset.
+
+```python
+from datasets import load_dataset
+from semhash import SemHash
+# Load two datasets to filter
+train_texts = load_dataset("ag_news", split="train")["text"]
+test_texts = load_dataset("ag_news", split="test")["text"]
+
+# Initialize a SemHash instance with the training data
+semhash = SemHash.from_records(records=train_texts)
+
+# Find representative samples from the test data against the training data
+representative_test_texts = semhash.find_representative(records=test_texts).selected
+```
+<Accordion title="Parameters">
+    <ParamField
+        path="records"
+        type="Sequence[Record]"
+    >
+        The new set of records (e.g., a test set) to find representative samples with against the fitted dataset.
+    </ParamField>
+
+    <ParamField
+        path="selection_size"
+        type="int"
+        default="10"
+    >
+        Number of representatives to select.
+    </ParamField>
+
+    <ParamField
+        path="candidate_limit"
+        type="int | Literal['auto']"
+        default="auto"
+    >
+        Number of top candidates to consider for MMR reranking. Defaults to "auto", which calculates the limit based on the total number of records.
+    </ParamField>
+
+    <ParamField
+        path="lambda_param"
+        type="float"
+        default="0.5"
+    >
+        Trade-off parameter between relevance (1.0) and diversity (0.0). Must be between 0 and 1.
+    </ParamField>   
+</Accordion>
+
+## Representative Sampling from a Multi-Column Dataset
+If you have a multi-column dataset, you can sample representatives from it by specifying the columns to use for representative sampling.
+
+```python
+from datasets import load_dataset
+from semhash import SemHash
+
+# Load the dataset
+dataset = load_dataset("squad_v2", split="train")
+
+# Convert the dataset to a list of dictionaries
+records = [dict(row) for row in dataset]
+
+# Initialize SemHash with the columns to deduplicate
+semhash = SemHash.from_records(records=records, columns=["question", "context"])
+
+# Find representative samples from the records
+representative_records = semhash.self_find_representative().selected
+```

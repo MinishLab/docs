@@ -1,0 +1,43 @@
+---
+title: Tokenlearn
+description: Pre-train Static Word Embeddings
+sidebarTitle: Usage
+icon: "code"
+---
+
+[Tokenlearn](https://github.com/MinishLab/tokenlearn) is a method for pre-training [Model2Vec](https://github.com/MinishLab/model2vec) models.
+It uses a pre-distilled Model2Vec model and pre-trains it on a large corpus of mean embeddings from a teacher model.
+
+## Quick Start
+
+### Installation
+
+Install Tokenlearn with the following command:
+
+```bash
+pip install tokenlearn
+```
+
+### Creating Features
+
+Create features with the following command:
+
+```bash
+python3 -m tokenlearn.featurize \
+    --model-name "baai/bge-base-en-v1.5" \
+    --output-dir "data/c4_features" \
+    --dataset-path "allenai/c4" \
+    --dataset-name "en" \
+    --dataset-split "train"
+```
+
+### Training a Model
+
+Train a model with the following command:
+
+```bash
+python3 -m tokenlearn.train \
+    --model-name "baai/bge-base-en-v1.5" \
+    --data-path "data/c4_features" \
+    --save-path "<path-to-save-model>"  
+```

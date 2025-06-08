@@ -52,25 +52,33 @@
           {
             "group": "SemHash",
             "pages": [
-              "packages/semhash/introduction"
+              "packages/semhash/introduction",
+              "packages/semhash/installation",
+              "packages/semhash/deduplication",
+              "packages/semhash/outlier-filtering",
+              "packages/semhash/representative-sampling",
+              "packages/semhash/benchmarks"
             ]
           },
           {
             "group": "Vicinity",
             "pages": [
-              "packages/vicinity/introduction"
+              "packages/vicinity/introduction",
+              "packages/vicinity/installation",
+              "packages/vicinity/usage",
+              "packages/vicinity/supported-backends"
             ]
           },
           {
             "group": "Tokenlearn",
             "pages": [
-              "packages/tokenlearn/introduction"
+              "packages/tokenlearn/usage"
             ]
           },
           {
             "group": "Model2Vec-rs",
             "pages": [
-              "packages/model2vec-rs/introduction"
+              "packages/model2vec-rs/usage"
             ]
           }
         ]
@@ -81,17 +89,6 @@
             "group": "Blog",
             "pages": [
               "blog/index"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "About",
-        "groups": [
-          {
-            "group": "About",
-            "pages": [
-              "about/index"
             ]
           }
         ]

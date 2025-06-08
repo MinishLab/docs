@@ -3,7 +3,41 @@ title: SemHash
 description: Fast Semantic Text Deduplication & Filtering
 sidebarTitle: Introduction
 icon: "book"
-mode: "wide"
 ---
 
-# Documentation in progress 🚧
+[SemHash](https://github.com/MinishLab/semhash) is a lightweight and flexible tool for deduplicating datasets, filtering outliers, and finding representative samples using semantic similarity.
+It combines fast embedding generation from [Model2Vec](https://github.com/MinishLab/model2vec) with efficient ANN-based similarity search through [Vicinity](https://github.com/MinishLab/vicinity).
+
+SemHash supports both single-dataset deduplication & filtering (e.g., cleaning up a train set by removing duplicates and outliers) and multi-dataset deduplication & filtering (e.g., ensuring no overlap between a test set and a train set). It works with simple datasets, such as text lists, and more complex ones, like multi-column QA datasets. Additionally, it includes functions to inspect deduplication results, making it easier to understand and refine your data cleaning process.
+
+
+## Quick Start 
+
+Install SemHash with the following command:
+```bash
+pip install semhash
+```
+
+Then, you can use it like this to deduplicate, filter outliers, and select representative samples (this example assumes you have the `datasets` library installed):
+
+```python
+from datasets import load_dataset
+from semhash import SemHash
+
+# Load a dataset to deduplicate
+texts = load_dataset("ag_news", split="train")["text"]
+
+# Initialize a SemHash instance
+semhash = SemHash.from_records(records=texts)
+
+# Deduplicate the texts
+deduplicated_texts = semhash.self_deduplicate().selected
+
+# Filter outliers
+filtered_texts = semhash.self_filter_outliers().selected
+
+# Find representative texts
+representative_texts = semhash.self_find_representative().selected
+```
+
+For advanced usage, check out the other documentation pages.
