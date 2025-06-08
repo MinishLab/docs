@@ -4,3 +4,100 @@ sidebarTitle: "Outlier Filtering"
 description: "Filter outliers with SemHash"
 icon: "filter"
 ---
+
+SemHash provides a simple way to filter outliers from a dataset.
+This works by selecting the samples that have the *lowest average similarity* to other samples in the dataset.
+This is particularly useful when you want to remove samples that are significantly different from the rest of the dataset, which can help improve the quality of your data.
+
+## Filter Outliers from a Single Dataset
+To filter outliers from a single dataset, you can use the `self_filter_outliers` method. This method will remove samples that are considered outliers based on their semantic similarity to the rest of the dataset.
+
+```python
+from datasets import load_dataset
+from semhash import SemHash
+
+# Load a dataset to filter
+texts = load_dataset("ag_news", split="train")["text"]
+
+# Initialize a SemHash instance
+semhash = SemHash.from_records(records=texts)
+
+# Filter outliers from the texts
+filtered_texts = semhash.self_filter_outliers().selected
+```
+<Accordion title="Parameters">
+
+    <ParamField
+        path="outlier_percentage"
+        type="float"
+        default="0.1"
+    >
+        The percentage (between 0 and 1) of records to consider as outliers.
+    </ParamField>   
+</Accordion>
+
+## Filter Outliers Across Multiple Datasets
+To filter outliers across multiple datasets, you can use the `filter_outliers` method. This method allows you to remove outliers from one dataset based on another dataset, which is useful for ensuring that your test set does not contain samples that are significantly different from your training set.
+
+```python
+from datasets import load_dataset
+from semhash import SemHash
+
+# Load two datasets to filter
+train_texts = load_dataset("ag_news", split="train")["text"]
+test_texts = load_dataset("ag_news", split="test")["text"]
+
+# Initialize a SemHash instance with the training data
+semhash = SemHash.from_records(records=train_texts)
+
+# Filter outliers from the test data against the training data
+filtered_test_texts = semhash.filter_outliers(records=test_texts).selected
+```
+<Accordion title="Parameters">
+    <ParamField
+        path="records"
+        type="Sequence[Record]"
+    >
+        The new set of records (e.g., a test set) to filter outliers with against the fitted dataset.
+    </ParamField>
+    <ParamField
+        path="outlier_percentage"
+        type="float"
+        default="0.1"
+    >
+        The percentage (between 0 and 1) of records to consider as outliers.
+    </ParamField>
+</Accordion>
+
+## Filter Outliers from a a Multi-Column Dataset
+
+If you have a multi-column dataset, you can filter outliers from it by specifying the columns to use for outlier detection and filtering.
+
+```python
+from datasets import load_dataset
+from semhash import SemHash
+
+# Load the dataset
+dataset = load_dataset("squad_v2", split="train")
+
+# Convert the dataset to a list of dictionaries
+records = [dict(row) for row in dataset]
+
+# Initialize SemHash with the columns to deduplicate
+semhash = SemHash.from_records(records=records, columns=["question", "context"])
+
+# Deduplicate the records
+deduplicated_records = semhash.self_filter_outliers().selected
+```
+
+## FilterResult Functionality
+
+The `FilterResult` returned by the outlier filtering methods provides several useful attributes:
+- `selected`: The records that were not considered outliers.
+- `filtered`: The records that were considered outliers.
+- `scores_selected`: The similarity scores for the selected records.
+- `scores_filtered`: The similarity scores for the filtered records.
+- `filter_ratio`: The ratio of records that were filtered out as outliers.
+- `selected_ratio`: The ratio of records that were selected as non-outliers.
+
+

@@ -10,4 +10,166 @@ This allows you to not only remove exact duplicates and near-duplicates, but als
 
 This is particularly useful for cleaning up datasets where you want to ensure that similar entries are not counted multiple times, such as in training datasets for machine learning models, or a RAG application where you want to avoid redundancy in your knowledge base.
 
+## Initialize a SemHash Instance
+To use SemHash for deduplication, you first need to initialize a `SemHash` instance with your dataset.
+This will build an index, which can then be used for fast deduplication.
+You can set several parameters here, such as the model to use.
+The default model is `minishlab/potion-base-8M`, which is a lightweight model that works well for most English text datasets.
+For multilingual datasets, you can use `minishlab/potion-multilingual-128M`, which is optimized for multilingual data.
+Note that you can also use your own custom model, or any SentenceTransformer model.
+
+```python
+from datasets import load_dataset
+from semhash import SemHash
+
+# Initialize a SemHash instance
+semhash = SemHash.from_records(records=texts)
+```
+
+<Accordion title="Parameters">
+
+    <ParamField
+        path="records"
+        type="Sequence[Record]"
+    >
+        A list of records (strings or dictionaries).
+    </ParamField>
+
+    <ParamField
+        path="columns"
+        type="Sequence[str] | None"
+        default="None"
+    >
+        Columns to featurize if records are dictionaries.
+    </ParamField>
+
+    <ParamField
+        path="use_ann"
+        type="bool"
+        default="True"
+    >
+        Whether to use approximate nearest neighbors (True) or basic search (False).
+    </ParamField>
+
+    <ParamField
+        path="model"
+        type="Encoder | None"
+        default="None"
+    >
+        Optional Encoder model. If `None`, uses the default (minishlab/potion-base-8M).
+    </ParamField>
+
+</Accordion>
+
+
+
 ## Deduplicate a Single Dataset
+
+To deduplicate a single dataset, you can use the `self_deduplicate` method.
+This will remove semantic duplicates from the dataset.
+
+```python
+from datasets import load_dataset
+from semhash import SemHash
+
+# Load a dataset to deduplicate
+texts = load_dataset("ag_news", split="train")["text"]
+
+# Initialize a SemHash instance
+semhash = SemHash.from_records(records=texts)
+
+# Deduplicate the texts
+deduplicated_texts = semhash.self_deduplicate().selected
+```
+
+<Accordion title="Parameters">
+
+    <ParamField
+        path="threshold"
+        type="float"
+        default="0.9"
+    >
+        Similarity threshold for deduplication.
+    </ParamField>
+
+</Accordion>
+
+
+## Deduplicate Across Multiple Datasets
+
+To deduplicate across multiple datasets, you can use the `deduplicate` method.
+This allows you to remove duplicates from one dataset against another dataset, which is useful for ensuring that your test set does not overlap with your training set.
+
+```python
+from datasets import load_dataset
+from semhash import SemHash
+
+# Load two datasets to deduplicate
+train_texts = load_dataset("ag_news", split="train")["text"]
+test_texts = load_dataset("ag_news", split="test")["text"]
+
+# Initialize a SemHash instance with the training data
+semhash = SemHash.from_records(records=train_texts)
+
+# Deduplicate the test data against the training data, optionally with a specific threshold
+deduplicated_test_texts = semhash.deduplicate(records=test_texts).selected
+```
+
+<Accordion title="Parameters">
+
+    <ParamField
+        path="records"
+        type="Sequence[Record]"
+    >
+        The new set of records (e.g., a test set) to deduplicate against the fitted dataset.
+    </ParamField>
+
+    <ParamField
+        path="threshold"
+        type="float"
+        default="0.9"
+    >
+        Similarity threshold for deduplication.
+    </ParamField>
+
+</Accordion>
+
+
+## Deduplicate a Multi-Column Dataset
+
+If you have a multi-column dataset, you can deduplicate it by specifying the columns to use for deduplication.
+For example, if you have a question-answering dataset with `question` and `context` columns, you can deduplicate based on both columns.
+This will filter out records that have similar questions and contexts, ensuring that you do not have redundant entries in your dataset.
+This is useful for datasets like SQuAD, where you can have the same question asked with different contexts, and you want to ensure that each question-context pair is unique.
+
+```python
+from datasets import load_dataset
+from semhash import SemHash
+
+# Load the dataset
+dataset = load_dataset("squad_v2", split="train")
+
+# Convert the dataset to a list of dictionaries
+records = [dict(row) for row in dataset]
+
+# Initialize SemHash with the columns to deduplicate
+semhash = SemHash.from_records(records=records, columns=["question", "context"])
+
+# Deduplicate the records
+deduplicated_records = semhash.self_deduplicate().selected
+```
+
+## DeduplicationResult Functionality
+
+The `DeduplicationResult` object returned by the deduplication methods provides several useful attributes that help you understand the deduplication process:
+- `selected`: The deduplicated records.
+- `filtered`: The records that were removed as duplicates. This is returned as a list of `DeduplicationResult`, each consisting of:
+    - `record`: The original record that was removed.
+    - `exact`: Whether the record was an exact duplicate.
+    - `duplicates`: A list of records that were considered duplicates of the removed record, along with their similarity score.
+- `duplicate_ratio`: The ratio of duplicates found in the dataset.
+- `exact_duplicate_ratio`: The ratio of exact duplicates found in the dataset.
+
+It also provides several useful methods:
+- `get_least_similar_from_duplicates(n)`: Returns the least similar record from the duplicates. This allows you to easily find the right deduplcation threhsold.
+- `rethreshold(threshold)`: Re-applies the deduplication with a new threshold, allowing you to adjust the sensitivity of the deduplication process without rebuilding the SemHas index.
