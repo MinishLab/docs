@@ -4,7 +4,7 @@ title: "Model2Vec as a fasttext alternative"
 categories: [model2vec]
 ---
 
-Model2Vec is typically viewed as a fast alternative to a sentence transformer. This is not weird, because:
+Model2Vec is typically viewed as a fast alternative to a sentence transformer. There's a good reason for that, because:
 
 1. Model2Vec models are distilled versions of sentence transformers
 2. Model2Vec models are drop-in replacements for sentence transformers
@@ -21,7 +21,7 @@ Here's the full table for both approaches:
 
 | dataset_name               |   Model2Vec |   fasttext |
 |:---------------------------|---------------------------------------:|----------------:|
-| 20_newgroups               |                                  66.18 |           57.11 |
+| 20_newsgroups               |                                  66.18 |           57.11 |
 | ade                        |                                  88.05 |           86.14 |
 | ag_news                    |                                  91.61 |           92.18 |
 | amazon_counterfactual      |                                  80.64 |           82.58 |
@@ -36,7 +36,6 @@ Here's the full table for both approaches:
 | student                    |                                  93.76 |           93.12 |
 | subj                       |                                  91.94 |           92.6  |
 | tweet_sentiment_extraction |                                  74.14 |           68.98 |
-|:---------------------------|---------------------------------------:|----------------:|
 | Average                    |                               81.99    |           79.25 | 
 
 Model2Vec outperforms fasttext on average, although with smaller gains than we anticipated.
@@ -57,7 +56,7 @@ The trained Model2Vec model is only 130 MB on disk, while the fasttext model is 
 
 # Zero shot (MTEB)
 
-fasttext vectors can also be used as word2vec embeddings. As such, we can test how well they work on MTEB as a zero shot embedding approach, comparing directly with a Model2Vec model. Following the above, we use the nltk `word_tokenize` function to tokenize text going into fasttext, and also normalize all the output vectors to unit length. We perform no additional preprocessing for Model2Vec. Because running MTEB can take a long time, we don't run all subsets. We use the [original MTEB benchmark](https://huggingface.co/spaces/mteb/leaderboard).
+fasttext vectors can also be used as word2vec embeddings. As such, we can test how well they work on the [Massive Text Embedding Benchmark (MTEB)](https://huggingface.co/spaces/mteb/leaderboard) as a zero shot embedding approach, comparing directly with a Model2Vec model. Following the above, we use the nltk `word_tokenize` function to tokenize text going into fasttext, and also normalize all the output vectors to unit length. We perform no additional preprocessing for Model2Vec. Because running MTEB can take a long time, we don't run all subsets. We use the [original MTEB benchmark](https://huggingface.co/spaces/mteb/leaderboard).
 
 ## Results
 
@@ -78,4 +77,4 @@ The only task on which fasttext performs well is `wordsim`, which is a collectio
 
 # Conclusion
 
-In conclusion: if you currently use fasttext for some process, be it the classifier or the word vectors, consider switching to Model2Vec. You'll gain speed, portability, and probably some performance!
+If you're still using fastText, be it for classification or for word embeddings, it's probably time for an upgrade. Model2Vec offers smaller models, faster inference, and better downstream results in most cases. Give it a try, and benchmark for yourself!
