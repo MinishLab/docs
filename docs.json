@@ -92,6 +92,17 @@
             ]
           }
         ]
+      },
+      {
+        "tab": "About",
+        "groups": [
+          {
+            "group": "About",
+            "pages": [
+              "about/index"
+            ]
+          }
+        ]
       }
     ]
   },
