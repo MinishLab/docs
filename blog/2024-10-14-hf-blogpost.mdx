@@ -14,7 +14,7 @@ This is where [Model2Vec](https://github.com/MinishLab/model2vec) comes in — o
 
 In this blog, we will discuss what Model2Vec is, how it works, how you can use it, and its performance. 
 
-| ![Model2Vec](/images/post_hf/ezlo_diagram_side.svg) |
+| ![Model2Vec](/images/blog/post_hf/ezlo_diagram_side.svg) |
 |:--:|
 |*Visualization of the Model2Vec architecture.*|
 
@@ -54,7 +54,7 @@ As we take a simple mean over tokens in the space, it is important that the vect
 
 To overcome this, we opt to use a well-known principle from language sciences, which is that, given a frequency ranked list, the frequency of the items in that list follow a power law distribution. This is called Zipf's law. So, if we take the assumption that a vocabulary is ranked by frequency, we can accurately down-weight really frequent items without needing to have access to actual frequencies. As tokenizer vocabularies are sorted by frequency, we already have access to a ranked list, so this optimization can be applied without any additional work.
 
-| ![PCAZipf](/images/post_hf/pca_zipf.svg) |
+| ![PCAZipf](/images/blog/post_hf/pca_zipf.svg) |
 |:--:|
 |*Visualization of the effects of applying PCA and Zipf weighting on the embeddings.*|
 
@@ -181,7 +181,7 @@ Again, Model2Vec outperforms GloVe BPEmb on all tasks, and even shows similar pe
 
 The figure below shows the relationship between the number of sentences per second and the average classification score. The circle sizes correspond to the number of parameters in the models (larger = more parameters). This plot shows that the Model2Vec models are much faster than the other models, while still being competitive in terms of classification performance with the all-MiniLM-L6-v2 model.
 
-| ![SpeedvsAccuracy](/images/post_hf/speed_vs_accuracy.png) |
+| ![SpeedvsAccuracy](/images/blog/post_hf/speed_vs_accuracy.png) |
 |:--:|
 |*The average accuracy over all classification datasets plotted against sentence per second. The circle size indicates model size.*|
 

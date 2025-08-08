@@ -1,0 +1,53 @@
+---
+title: Custom Models
+description: Use custom models with SemHash
+sidebarTitle: Custom Models
+icon: "brain-circuit"
+---
+
+By default, SemHash uses [potion-base-8M](https://huggingface.co/minishlab/potion-base-8M) as its embedding model.
+This model is very fast, and works well for most usecases. However, it's trained for English data,
+and might not perform as well as larger models. Fortunately, you can easily swap the model. Any model that follows our
+[encoder protocol](https://github.com/MinishLab/semhash/blob/main/semhash/utils.py) will work.
+This means that Model2Vec models and Sentence Transformers will work out of the box.
+We recommend using [potion-multilingual-128M](https://huggingface.co/minishlab/potion-multilingual-128M) for multilingual datasets.
+
+## Using a Model2Vec model
+The following example shows how to use a Model2Vec model with SemHash:
+```python
+ from datasets import load_dataset
+from model2vec import StaticModel
+from semhash import SemHash
+
+# Load a dataset to deduplicate
+texts = load_dataset("ag_news", split="train")["text"]
+
+# Load an embedding model (in this example, a multilingual model)
+model = StaticModel.from_pretrained("minishlab/potion-multilingual-128M")
+
+# Initialize a SemHash with the model and custom encoder
+semhash = SemHash.from_records(records=texts, model=model)
+
+# Deduplicate the texts
+deduplicated_texts = semhash.self_deduplicate()
+```
+
+## Using a Sentence Transformer
+The following example shows how to use a Sentence Transformer with SemHash:
+```python
+from datasets import load_dataset
+from semhash import SemHash
+from sentence_transformers import SentenceTransformer
+
+# Load a dataset to deduplicate
+texts = load_dataset("ag_news", split="train")["text"]
+
+# Load a sentence-transformers model
+model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+
+# Initialize a SemHash with the model and custom encoder
+semhash = SemHash.from_records(records=texts, model=model)
+
+# Deduplicate the texts
+deduplicated_texts = semhash.self_deduplicate()
+```
