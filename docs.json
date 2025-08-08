@@ -57,7 +57,8 @@
               "packages/semhash/deduplication",
               "packages/semhash/outlier-filtering",
               "packages/semhash/representative-sampling",
-              "packages/semhash/benchmarks"
+              "packages/semhash/benchmarks",
+              "packages/semhash/custom-encoders"
             ]
           },
           {
