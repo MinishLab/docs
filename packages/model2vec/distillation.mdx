@@ -60,14 +60,6 @@ m2v_model.save_pretrained("m2v_model")
 </ParamField>
 
 <ParamField
-    path="apply_zipf"
-    type="bool | None"
-    default="None"
->
-    **Deprecated.** Used to control whether Zipf weighting is applied. Now controlled via `sif_coefficient`. If `None`, no Zipf weighting is applied.
-</ParamField>
-
-<ParamField
     path="sif_coefficient"
     type="float | None"
     default="1e-4"
@@ -100,11 +92,15 @@ m2v_model.save_pretrained("m2v_model")
 </ParamField>
 
 <ParamField
-    path="use_subword"
-    type="bool | None"
-    default="None"
+    path="pooling"
+    type="PoolingMode | str"
+    default="PoolingMode.MEAN"
 >
-    **Deprecated.** If not `None`, a warning is shown. Does not affect current behavior.
+The pooling mode to use for creating embeddings. Can be one of:
+        `mean` (default): mean over all tokens. Robust and works well in most cases.
+        `last`: use the last token's hidden state (often the [EOS] token). Common for decoder-style models.
+        `first`: use the first token's hidden state ([CLS] token in BERT-style models).
+        `pooler`: use the pooler output (if available). This is often a non-linear projection of the [CLS] token.
 </ParamField>
 
 </Accordion>

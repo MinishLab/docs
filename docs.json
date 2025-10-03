@@ -46,7 +46,8 @@
               "packages/model2vec/distillation",
               "packages/model2vec/training",
               "packages/model2vec/models",
-              "packages/model2vec/results"
+              "packages/model2vec/results",
+              "packages/model2vec/integrations"
             ]
           },
           {

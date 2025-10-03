@@ -1,0 +1,61 @@
+---
+layout: post
+title: "Model2Vec Size Improvements"
+categories: [Model2Vec]
+---
+
+# Introduction
+
+
+Over the past year, we've implemented several ways to reduce the size of Model2Vec models. Due to the nature of our distillation technique, Model2Vec distilled models are already relatively compact, but we can make them even smaller (~6mb), as we will show in this blogpost.
+This can be beneficial for deployment in resource-constrained environments such as edge and mobile devices, where memory and storage are limited. 
+It also means we can load models faster, and serve more models at the same time. 
+
+Since all the parameters in a Model2Vec model are in the embedding matrix, we can reduce size in three ways:
+-  By reducing the dimensionality of the embeddings
+-  By reducing the precision of the embeddings (quantization)
+-  By reducing the number of embeddings (the vocabulary size)
+
+With our latest release, we can now directly modify all of these in Model2Vec. Let's go over them one by one!
+
+
+## Overview
+We use the following three techniques to reduce model size:
+- Principal Component Analysis (PCA) (available since our initial release)
+- Quantization (available since v0.5.0)
+- Vocabulary Quantization (our shiny new feature which we just released in v0.7.0)
+
+### 1. PCA
+
+The first and most straightforward way to reduce model size is dimensionality reduction, which we do with PCA. Most embedding models operate at high dimensions (e.g. 768), which is a lot more than we (usually) need for static embedding models.
+
+### 2. Quantization
+
+Next up is quantization. By default, embeddings are stored as 32-bit floats. By quantizing them to 16-bit floats, or even 8-bit integers, we can cut storage requirements by 2x-4x.
+
+### 3. Vocabulary quantization
+
+Finally, we can modify the vocabulary itself. Large vocabularies are expensive: every token needs its own vector. But many tokens are rare, and some are near-duplicates. With vocabulary quantization, we cluster embeddings using k-means and merge them, effectively compressing the vocabulary without throwing away coverage.
+
+
+## Results
+
+Here's how the different strategies stack up. For these experiments, we start with a distilled [bge-base-en-v1.5](https://huggingface.co/BAAI/bge-base-en-v1.5) model using default parameters (baseline).
+
+| Model                 | Size  | Average (MTEB) | Drop vs. Baseline |
+|------------------------|-------|----------------|-------------------|
+| Baseline (768d, FP32) | 92 MB | 46.69          | –                 |
+| + PCA (256d)          | 32 MB | 46.63          | -0.06             |
+| + Quantization (INT8) | 9 MB | 46.60          | -0.09             |
+| + Vocab quantization (20k clusters)  | 6 MB  | 45.99          | -0.70             |
+
+
+
+As you can see, we can shrink a **92 MB** model down to **6 MB (15x smaller!)** while losing less than 1% performance on MTEB.
+Another interesting thing to see is that PCA and quantization have a very small effect on performance, and can essentially be applied without any trade-offs.
+Note that the vocabulary of the used base model is already quite small (~30k tokens). We expect vocabulary quantization to have a bigger effect on models with larger vocabularies (e.g. multilingual models), which we will explore in future work.
+
+
+
+As always, we'd love to hear your feedback — let us know what you're building with these tiny models, and if you want to try this yourself, grab the latest [Model2Vec release](https://github.com/MinishLab/model2vec)!
+
