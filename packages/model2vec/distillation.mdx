@@ -92,6 +92,14 @@ m2v_model.save_pretrained("m2v_model")
 </ParamField>
 
 <ParamField
+    path="vocabulary_quantization"
+    type="int | None"
+    default="None"
+>
+    The number of clusters to use for vocabulary quantization. If this is None, no quantization is performed.
+</ParamField>
+
+<ParamField
     path="pooling"
     type="PoolingMode | str"
     default="PoolingMode.MEAN"
@@ -104,3 +112,30 @@ The pooling mode to use for creating embeddings. Can be one of:
 </ParamField>
 
 </Accordion>
+
+## Advanced Distillation Options
+There are many ways to customize the distillation process. Here’s an example that uses a custom vocabulary, different PCA dimensions, a different SIF coefficient, int8 quantization, vocabulary quantization, and last-token pooling:
+```python
+from model2vec.distill import distill
+m2v_model = distill(
+    model_name="Qwen/Qwen3-Embedding-0.6B",
+    vocabulary=["star wars", "lightsaber", "jedi", "sith"], # Add a custom vocabulary
+    pca_dims=128, # Reduce to 128 dimensions
+    sif_coefficient=1e-5, # Use a different SIF coefficient for weighting
+    quantize_to="int8", # Quantize to int8
+    vocabulary_quantization=10000, # Use vocabulary quantization with 1000 clusters to reduce vocabulary size
+    pooling="last" # Use last token pooling
+)
+```
+
+## Distillation Best Practices
+
+There are number of best practices based on our own extensive experiments that can help you get the most out of your distilled models:
+- **Choose the right base model**: The choice of base model is crucial. In our experiments, we found that models that perform better on [MTEB](https://huggingface.co/spaces/mteb/leaderboard) do not always lead to better distilled models. We recommend trying out a few different base models to see which one works best for your specific use case. 
+A good starting point is [bge-base-en-v1.5](https://huggingface.co/BAAI/bge-base-en-v1.5) for English data, and [bge-m3](https://huggingface.co/BAAI/bge-m3) for multilingual data, which we also used for distilling the [Potion models](https://huggingface.co/collections/minishlab/potion-6721e0abd4ea41881417f062).
+- **Use a relevant vocabulary**: The vocabulary used for distillation can have a significant impact on performance. If you have a specific domain or use case, consider using a vocabulary that is relevant to that domain.
+- **Set relatively low dimensionality**: When using PCA for dimensionality reduction, it's almost always safe to choose a lower dimensionality than the used base model. The default we use is 256, and this tends to work just as well as the original dimensions across many tasks.
+- **Quantize the model**: Aggressive quantization usually leads to little to no performance drop (as shown in our [size reduction blogpost](https://minish.ai/blog/2025-10-05-size-blogpost)). `float16` is a good default, but in most cases even `int8` will work well and reduce model size substantially.
+- **Choose the right pooling mode**: The default mode for pooling is mean pooling, which works well in most cases.
+However, some models (e.g. decoder-style based embedding models such as [Qwen3-Embedding](https://huggingface.co/Qwen/Qwen3-Embedding-0.6B)) use last-token (EOS) pooling. 
+Since detecting the correct pooling mode is (almost) impossible, carefully check which pooling mode should be used for the used base model if performance is lower than expected.
