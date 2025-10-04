@@ -25,3 +25,30 @@ embeddings = model.encode(["Hello world", "Static embeddings are great!"])
 ```
 
 For advanced usage, check out the other documentation pages.
+
+## How Mode2Vec works
+
+Model2Vec turns a Sentence Transformer into a compact static embedding model.
+It does this by computing one fixed vector per token, plus lightweight post-processing.
+Sentence embeddings are then produced by simply averaging token vectors.
+This means that during inference time we only have to look up the fixed token vectors in our embedding matrix,
+delivering very high throughput on CPU with competitive quality for many tasks.
+
+
+The process consists of the following steps:
+- **Forward pass**: for every individual token in the selected base model, we run a forward pass through the base model.
+This creates our initial static embeddings. Optionally, we can expand the base model's vocabulary with new tokens to improve performance on specific domains.
+- **Dimensionality reduction**: we apply PCA on the embedding matrix, reducing its dimensionality while preserving important information.
+Note that applying PCA improves performance even if we don't reduce dimensionality, as it normalizes the embedding space.
+- **Token weighting**: after creating the initial embeddings, we reweight them using [Smooth Inverse Frequency (SIF) weighting](https://openreview.net/pdf?id=SyK00v5xx).
+The formula for SIF weighting is **$w = \frac{1e^{-3}}{1e^{-3} + p}$**, where **$p$** is the token probability.
+Normally, **$p$** would come from corpus frequencies, but during distillation we don't have access to a corpus.
+Fortunately, most tokenizers provide a vocabulary sorted by token frequency, which allows us to approximate probabilities using Zipf's law: the observation that word frequency in natural language roughly follows a power-law distribution.
+In other words, a token's rank in the vocabulary serves as a good proxy for its frequency, allowing us to apply SIF weighting without needing any external data.
+- **Quantization (optional):** after distilling the model, we can optionally quantize the embeddings to 16-bit floats or 8-bit integers, reducing model size by a factor of 2x-4x with minimal performance loss.
+We can also quantize the vocabulary itself, by clustering embeddings using k-means and merging them, effectively compressing the vocabulary without throwing away coverage.
+- **Pre-training (optional):** after distillation, we can optionally pre-train the model on a large corpus of mean embeddings from the base model using [Tokenlearn](https://github.com/MinishLab/tokenlearn).
+This is how our [Potion models](https://huggingface.co/collections/minishlab/potion-6721e0abd4ea41881417f062) are created.
+This process consists of the following steps:
+    - Featurization: a large corpus (e.g. a portion of [C4](https://huggingface.co/datasets/allenai/c4)) is embedded with the base Sentence Transformer to obtain target sentence embeddings.
+    - Training: The Model2Vec model is trained to minimize the MSE loss between its sentence representations (mean of token vectors) and the base model's target embeddings.
