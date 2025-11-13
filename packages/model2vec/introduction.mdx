@@ -18,9 +18,9 @@ pip install model2vec
 Then, you can use it like this:
 
 ```python
-from model2vec import Model2Vec
+from model2vec import StaticModel
 
-model = Model2Vec.from_pretrained("minishlab/potion-base-8M")
+model = StaticModel.from_pretrained("minishlab/potion-base-8M")
 embeddings = model.encode(["Hello world", "Static embeddings are great!"])
 ```
 

@@ -7,11 +7,11 @@ icon: "bolt"
 
 ## Loading a Model
 
-To load a pre-trained model, you can use the `Model2Vec.from_pretrained` method. This method allows you to load models from the Hugging Face Hub or from a local path.
+To load a pre-trained model, you can use the `StaticModel.from_pretrained` method. This method allows you to load models from the Hugging Face Hub or from a local path.
 ```python
-from model2vec import Model2Vec
+from model2vec import StaticModel
 
-model = Model2Vec.from_pretrained("minishlab/potion-base-8M")
+model = StaticModel.from_pretrained("minishlab/potion-base-8M")
 ```
 
 <Accordion title="Parameters">
@@ -69,11 +69,11 @@ model = Model2Vec.from_pretrained("minishlab/potion-base-8M")
 
 ## Creating Mean Embeddings
 
-To create mean embeddings, you can use the `encode` method of the `Model2Vec` class. This method allows you to encode a list of sentences into mean embeddings.
+To create mean embeddings, you can use the `encode` method of the `StaticModel` class. This method allows you to encode a list of sentences into mean embeddings.
 ```python
-from model2vec import Model2Vec
+from model2vec import StaticModel
 
-model = Model2Vec.from_pretrained("minishlab/potion-base-8M")
+model = StaticModel.from_pretrained("minishlab/potion-base-8M")
 embeddings = model.encode(["Hello world", "Static embeddings are great!"])
 ```
 
@@ -136,11 +136,11 @@ embeddings = model.encode(["Hello world", "Static embeddings are great!"])
 </Accordion>
 
 ## Creating Sequence Embeddings
-To create sequence embeddings, you can use the `encode_as_sequence` method of the `Model2Vec` class. This method allows you to encode a list of sentences into sequence embeddings, which are useful for tasks where you need a single embedding per token.
+To create sequence embeddings, you can use the `encode_as_sequence` method of the `StaticModel` class. This method allows you to encode a list of sentences into sequence embeddings, which are useful for tasks where you need a single embedding per token.
 
 ```python
-from model2vec import Model2Vec
-model = Model2Vec.from_pretrained("minishlab/potion-base-8M")
+from model2vec import StaticModel
+model = StaticModel.from_pretrained("minishlab/potion-base-8M")
 embeddings = model.encode_as_sequence(["Hello world", "Static embeddings are great!"], mode="sequence")
 ```
 
