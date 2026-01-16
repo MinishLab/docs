@@ -7,8 +7,8 @@ icon: "brain-circuit"
 
 By default, SemHash uses [potion-base-8M](https://huggingface.co/minishlab/potion-base-8M) as its embedding model for text.
 This model is very fast, and works well for most use cases. However, you can easily swap the model for text, images, or any other modality. Any model that follows our [encoder protocol](https://github.com/MinishLab/semhash/blob/main/semhash/utils.py) will work.
-
 The encoder protocol requires only an `encode(inputs, **kwargs)` method that returns a numpy array. This makes it easy to integrate any embedding model for any modality.
+We recommend using [potion-multilingual-128M](https://huggingface.co/minishlab/potion-multilingual-128M) for multilingual text datasets.
 
 ## Using a Model2Vec model
 The following example shows how to use a Model2Vec model with SemHash:
