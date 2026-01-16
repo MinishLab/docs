@@ -1,15 +1,17 @@
 ---
 title: "Representative Sampling"
 sidebarTitle: "Representative Sampling"
-description: "Find representative samples with SemHash"
+description: "Find representative samples with SemHash using configurable diversification strategies"
 icon: "grid"
 ---
 
-SemHash provides a simple interface for representative sampling, which is useful for selecting a subset of data that best represents the entire dataset.
+SemHash provides a flexible interface for representative sampling, which is useful for selecting a subset of data that best represents the entire dataset.
 This can be particularly useful in scenarios where you want to reduce the size of your dataset while retaining its diversity.
 
 This works by first selecting samples that have the *highest average similarity* to other samples in the dataset (the most "central" samples),
-and then iteratively selecting samples that are most dissimilar to the already selected ones with that set using *maximum marginal relevance (MMR)*.
+and then applying a diversification strategy to select samples that are diverse within that candidate set.
+
+SemHash uses [Pyversity](https://github.com/Pringled/pyversity) for diversification, supporting multiple strategies.
 
 ## Representative Sampling from a Single Dataset
 To perform representative sampling from a single dataset, you can use the `self_find_representative` method. This method will select a subset of samples that best represent the entire dataset based on their semantic similarity.
@@ -44,15 +46,23 @@ representative_texts = semhash.self_find_representative().selected
         type="int | Literal['auto']"
         default="auto"
     >
-        Number of top candidates to consider for MMR reranking. Defaults to "auto", which calculates the limit based on the total number of records.
+        Number of top candidates to consider for diversification. Defaults to "auto", which calculates the limit based on the total number of records (typically 10% of the dataset, with a min of 100 and max of 1000).
     </ParamField>
 
     <ParamField
-        path="lambda_param"
+        path="diversity"
         type="float"
         default="0.5"
     >
-        Trade-off parameter between relevance (1.0) and diversity (0.0). Must be between 0 and 1.
+        Trade-off between diversity (1.0) and relevance (0.0). Must be between 0 and 1. Higher values prioritize diversity, lower values prioritize relevance.
+    </ParamField>
+
+    <ParamField
+        path="strategy"
+        type="Strategy | str"
+        default="Strategy.MMR"
+    >
+        Diversification strategy to use. Options: `"MMR"`, `"MSD"`, `"DPP"`, `"COVER"`, `"SSD"`. Default is MMR (Maximal Marginal Relevance).
     </ParamField>
 
 </Accordion>
@@ -94,16 +104,24 @@ representative_test_texts = semhash.find_representative(records=test_texts).sele
         type="int | Literal['auto']"
         default="auto"
     >
-        Number of top candidates to consider for MMR reranking. Defaults to "auto", which calculates the limit based on the total number of records.
+        Number of top candidates to consider for diversification. Defaults to "auto", which calculates the limit based on the total number of records (typically 10% of the dataset, with a min of 100 and max of 1000).
     </ParamField>
 
     <ParamField
-        path="lambda_param"
+        path="diversity"
         type="float"
         default="0.5"
     >
-        Trade-off parameter between relevance (1.0) and diversity (0.0). Must be between 0 and 1.
-    </ParamField>   
+        Trade-off between diversity (1.0) and relevance (0.0). Must be between 0 and 1. Higher values prioritize diversity, lower values prioritize relevance.
+    </ParamField>
+
+    <ParamField
+        path="strategy"
+        type="Strategy | str"
+        default="Strategy.MMR"
+    >
+        Diversification strategy to use. Options: `"MMR"`, `"MSD"`, `"DPP"`, `"COVER"`, `"SSD"`. Default is MMR (Maximal Marginal Relevance).
+    </ParamField>
 </Accordion>
 
 ## Representative Sampling from a Multi-Column Dataset
@@ -124,4 +142,29 @@ semhash = SemHash.from_records(records=records, columns=["question", "context"])
 
 # Find representative samples from the records
 representative_records = semhash.self_find_representative().selected
+```
+
+## Customizing Diversification
+
+You can customize the diversification strategy and trade-off between relevance and diversity:
+
+```python
+from semhash import SemHash
+from pyversity import Strategy
+
+# Load your dataset
+semhash = SemHash.from_records(records=texts)
+
+# Use different strategies
+mmr_samples = semhash.self_find_representative(
+    selection_size=20,
+    diversity=0.5,
+    strategy=Strategy.MMR  # Default
+).selected
+
+dpp_samples = semhash.self_find_representative(
+    selection_size=20,
+    diversity=0.8,  # Higher diversity
+    strategy=Strategy.DPP # Different strategy
+).selected
 ```

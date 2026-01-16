@@ -44,19 +44,26 @@ semhash = SemHash.from_records(records=texts)
     </ParamField>
 
     <ParamField
-        path="use_ann"
-        type="bool"
-        default="True"
-    >
-        Whether to use approximate nearest neighbors (True) or basic search (False).
-    </ParamField>
-
-    <ParamField
         path="model"
         type="Encoder | None"
         default="None"
     >
         Optional Encoder model. If `None`, uses the default (minishlab/potion-base-8M).
+    </ParamField>
+
+    <ParamField
+        path="ann_backend"
+        type="Backend | str"
+        default="Backend.USEARCH"
+    >
+        The ANN backend to use for similarity search. Options include `Backend.USEARCH` (default), `Backend.FAISS`, `Backend.BASIC` (exact search), and others supported by Vicinity.
+    </ParamField>
+
+    <ParamField
+        path="**kwargs"
+        type="Any"
+    >
+        Additional keyword arguments to pass to the Vicinity index (e.g., backend-specific parameters).
     </ParamField>
 
 </Accordion>
@@ -158,6 +165,32 @@ semhash = SemHash.from_records(records=records, columns=["question", "context"])
 # Deduplicate the records
 deduplicated_records = semhash.self_deduplicate().selected
 ```
+
+## Deduplicate Image Datasets
+
+SemHash works with any modality, including images. Here's an example using a vision model:
+
+```python
+from datasets import load_dataset
+from sentence_transformers import SentenceTransformer
+from semhash import SemHash
+
+# Load image dataset and vision model
+model = SentenceTransformer('clip-ViT-B-32')
+train_dataset = load_dataset("uoft-cs/cifar10", split="train")
+test_dataset = load_dataset("uoft-cs/cifar10", split="test")
+
+# Initialize with training images
+semhash = SemHash.from_records(list(train_dataset), columns=["img"], model=model)
+
+# Single-dataset deduplication
+deduplicated_train = semhash.self_deduplicate().selected
+
+# Cross-dataset deduplication (remove test images that appear in train)
+deduplicated_test = semhash.deduplicate(list(test_dataset)[:1000]).selected
+```
+
+See the [Custom Models](/packages/semhash/custom-encoders) page for more details on using vision encoders.
 
 ## Inspecting Deduplication Results
 

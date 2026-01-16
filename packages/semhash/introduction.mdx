@@ -51,11 +51,11 @@ from sentence_transformers import SentenceTransformer
 from semhash import SemHash
 
 # Load an image dataset and vision model
-model = SentenceTransformer('clip-ViT-B-32')
-dataset = load_dataset("uoft-cs/cifar10", split="test")
+model = SentenceTransformer("clip-ViT-B-32")
+dataset = load_dataset("uoft-cs/cifar10", split="train")
 
 # Initialize a SemHash instance with the 'img' column
-semhash = SemHash.from_records(list(dataset)[:100], columns=["img"], model=model)
+semhash = SemHash.from_records(list(dataset), columns=["img"], model=model)
 
 # Deduplicate the images
 deduplicated_images = semhash.self_deduplicate().selected
