@@ -1,24 +1,25 @@
 ---
 title: SemHash
-description: Fast Semantic Text Deduplication & Filtering
+description: Fast Multimodal Semantic Deduplication & Filtering
 sidebarTitle: Introduction
 icon: "book"
 ---
 
-[SemHash](https://github.com/MinishLab/semhash) is a lightweight and flexible tool for deduplicating datasets, filtering outliers, and finding representative samples using semantic similarity.
-It combines fast embedding generation from [Model2Vec](https://github.com/MinishLab/model2vec) with efficient ANN-based similarity search through [Vicinity](https://github.com/MinishLab/vicinity).
+[SemHash](https://github.com/MinishLab/semhash) is a lightweight library for semantic deduplication, outlier filtering, and representative sample selection. It's fully multimodal: text works out-of-the-box with fast [Model2Vec](https://github.com/MinishLab/model2vec) embeddings, and you can bring your own encoders for images, audio, or custom models.
 
-SemHash supports both single-dataset deduplication & filtering (e.g., cleaning up a train set by removing duplicates and outliers) and multi-dataset deduplication & filtering (e.g., ensuring no overlap between a test set and a train set). It works with simple datasets, such as text lists, and more complex ones, like multi-column QA datasets. Additionally, it includes functions to inspect deduplication results, making it easier to understand and refine your data cleaning process.
+SemHash supports both single-dataset operations (clean a training set) and cross-dataset operations (deduplicate test against train). It works with simple lists and complex multi-column datasets, and includes inspection tools to help you understand and refine results. All operations use [Vicinity](https://github.com/MinishLab/vicinity) for efficient similarity search.
 
 
-## Quick Start 
+## Quick Start
 
 Install SemHash with the following command:
 ```bash
 pip install semhash
 ```
 
-Then, you can use it like this to deduplicate, filter outliers, and select representative samples (this example assumes you have the `datasets` library installed):
+### Text Deduplication
+
+Use SemHash to deduplicate text datasets (this example assumes you have the `datasets` library installed):
 
 ```python
 from datasets import load_dataset
@@ -40,4 +41,30 @@ filtered_texts = semhash.self_filter_outliers().selected
 representative_texts = semhash.self_find_representative().selected
 ```
 
-For advanced usage, check out the other documentation pages.
+### Image Deduplication
+
+Use SemHash with vision models for image deduplication (requires `pip install sentence-transformers`):
+
+```python
+from datasets import load_dataset
+from sentence_transformers import SentenceTransformer
+from semhash import SemHash
+
+# Load an image dataset and vision model
+model = SentenceTransformer('clip-ViT-B-32')
+dataset = load_dataset("uoft-cs/cifar10", split="test")
+
+# Initialize a SemHash instance with the 'img' column
+semhash = SemHash.from_records(list(dataset)[:100], columns=["img"], model=model)
+
+# Deduplicate the images
+deduplicated_images = semhash.self_deduplicate().selected
+
+# Filter outliers
+filtered_images = semhash.self_filter_outliers().selected
+
+# Find representative images
+representative_images = semhash.self_find_representative().selected
+```
+
+For advanced usage and custom encoders, check out the other documentation pages.
