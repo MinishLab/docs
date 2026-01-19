@@ -1,17 +1,19 @@
 ---
 title: "Benchmarks"
 sidebarTitle: "Benchmarks"
-description: "Benchmarks for SemHash"
+description: "Text and image deduplication benchmarks for SemHash"
 icon: "chart-line"
 ---
 
+We've benchmarked SemHash on a variety of text and image datasets to measure the deduplication performance and speed.
 
+## Text Benchmarks
 
-We've benchmarked SemHash on a variety of datasets to measure the deduplication performance and speed. The benchmarks were run with the following setup:
-- The benchmarks were all run on CPU
-- The benchmarks were all run with `use_ann=True`
-- The used encoder is the default encoder ([potion-base-8M](https://huggingface.co/minishlab/potion-base-8M)).
-- The timings include the encoding time, index building time, and deduplication time.
+All text benchmarks were run with the following setup:
+- CPU-only (no GPU acceleration)
+- ANN backend: Default backend (USearch)
+- Encoder: Default encoder ([potion-base-8M](https://huggingface.co/minishlab/potion-base-8M))
+- Timing includes encoding time, index building time, and deduplication time
 ### Train Deduplication Benchmark
 
 | Dataset              |  Original Train Size |  Deduplicated Train Size |  % Removed |   Deduplication Time (s) |
@@ -59,5 +61,41 @@ We've benchmarked SemHash on a variety of datasets to measure the deduplication 
 | wikitext             |      1801350 |         4358 |                     2139 |      50.92 |                    40.32 |
 
 
-As can be seen, SemHash is extremely fast, and scales to large datasets with millions of records. There are some notable examples of train/test leakage, such as `enron_spam` and `student`, where the test dataset contains a significant amount of semantic overlap with the training dataset.
+### Key Findings
+
+SemHash is extremely fast and scales to large datasets with millions of records:
+- **Speed**: Deduplication is fast even for large datasets (e.g., 1.8M records in ~83 seconds)
+- **Train/Test Leakage**: Several datasets show significant train/test overlap:
+  - `enron_spam`: 47% of test data overlaps with training data
+  - `student`: 52% of test data overlaps with training data
+  - `wikitext`: 51% of test data overlaps with training data
+
+## Image Benchmarks
+
+All image benchmarks were run with the following setup:
+- Device: Apple Silicon GPU (MPS)
+- ANN backend: Default backend (USearch)
+- Encoder: MobileNetV3-Small ([mobilenetv3_small_100.lamb_in1k](https://huggingface.co/timm/mobilenetv3_small_100.lamb_in1k))
+- Batch size: 128 images per batch
+- Timing includes encoding time, index building time, and deduplication time
+
+### Train Deduplication Benchmark
+
+| Dataset              |  Original Train Size |  Deduplicated Train Size |  % Removed |   Deduplication Time (s) |
+|----------------------|----------------------|--------------------------|------------|--------------------------|
+| cifar10              |                50000 |                    48274 |       3.45 |                    61.20 |
+| fashion_mnist        |                60000 |                    16714 |      72.14 |                    86.61 |
+
+### Train/Test Deduplication Benchmark
+
+| Dataset              |   Train Size |    Test Size |   Deduplicated Test Size |  % Removed |   Deduplication Time (s) |
+|----------------------|--------------|--------------|--------------------------|------------|--------------------------|
+| cifar10              |        50000 |        10000 |                     9397 |       6.03 |                    67.43 |
+| fashion_mnist        |        60000 |        10000 |                     2052 |      79.48 |                    72.14 |
+
+### Key Findings
+
+- **Fashion-MNIST high deduplication**: Fashion-MNIST shows very high duplication rates (72% train, 79% test) due to the simple nature of the dataset (10 clothing categories with similar items)
+- **CIFAR-10 moderate deduplication**: CIFAR-10 shows lower duplication (3.45% train, 6.03% test) as it contains more diverse natural images
+- **Speed**: Image deduplication is fast even for large datasets (60k images in ~87 seconds on MPS); note that the actual deduplication step is quick, with most time spent on encoding images
 

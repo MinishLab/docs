@@ -44,19 +44,26 @@ semhash = SemHash.from_records(records=texts)
     </ParamField>
 
     <ParamField
-        path="use_ann"
-        type="bool"
-        default="True"
-    >
-        Whether to use approximate nearest neighbors (True) or basic search (False).
-    </ParamField>
-
-    <ParamField
         path="model"
         type="Encoder | None"
         default="None"
     >
         Optional Encoder model. If `None`, uses the default (minishlab/potion-base-8M).
+    </ParamField>
+
+    <ParamField
+        path="ann_backend"
+        type="Backend | str"
+        default="Backend.USEARCH"
+    >
+        The ANN backend to use for similarity search. Options include `Backend.USEARCH` (default), `Backend.FAISS`, `Backend.BASIC` (exact search), and others supported by Vicinity.
+    </ParamField>
+
+    <ParamField
+        path="**kwargs"
+        type="Any"
+    >
+        Additional keyword arguments to pass to the Vicinity index (e.g., backend-specific parameters).
     </ParamField>
 
 </Accordion>
@@ -159,17 +166,77 @@ semhash = SemHash.from_records(records=records, columns=["question", "context"])
 deduplicated_records = semhash.self_deduplicate().selected
 ```
 
-## DeduplicationResult Functionality
+## Deduplicate Image Datasets
 
-The `DeduplicationResult` object returned by the deduplication methods provides several useful attributes that help you understand the deduplication process:
-- `selected`: The deduplicated records.
-- `filtered`: The records that were removed as duplicates. This is returned as a list of `DeduplicationResult`, each consisting of:
-    - `record`: The original record that was removed.
-    - `exact`: Whether the record was an exact duplicate.
-    - `duplicates`: A list of records that were considered duplicates of the removed record, along with their similarity score.
-- `duplicate_ratio`: The ratio of duplicates found in the dataset.
-- `exact_duplicate_ratio`: The ratio of exact duplicates found in the dataset.
+SemHash works with any modality, including images. Here's an example using a vision model:
 
-It also provides several useful methods:
-- `get_least_similar_from_duplicates(n)`: Returns the least similar record from the duplicates. This allows you to easily find the right deduplcation threhsold.
-- `rethreshold(threshold)`: Re-applies the deduplication with a new threshold, allowing you to adjust the sensitivity of the deduplication process without rebuilding the SemHas index.
+```python
+from datasets import load_dataset
+from sentence_transformers import SentenceTransformer
+from semhash import SemHash
+
+# Load image dataset and vision model
+model = SentenceTransformer('clip-ViT-B-32')
+train_dataset = load_dataset("uoft-cs/cifar10", split="train")
+test_dataset = load_dataset("uoft-cs/cifar10", split="test")
+
+# Initialize with training images
+semhash = SemHash.from_records(list(train_dataset), columns=["img"], model=model)
+
+# Single-dataset deduplication
+deduplicated_train = semhash.self_deduplicate().selected
+
+# Cross-dataset deduplication (remove test images that appear in train)
+deduplicated_test = semhash.deduplicate(list(test_dataset)[:1000]).selected
+```
+
+See the [Custom Models](/packages/semhash/custom-encoders) page for more details on using vision encoders.
+
+## Inspecting Deduplication Results
+
+The `DeduplicationResult` object provides powerful tools for understanding and refining your deduplication:
+
+```python
+from datasets import load_dataset
+from semhash import SemHash
+
+# Load and deduplicate a dataset
+texts = load_dataset("ag_news", split="train")["text"]
+semhash = SemHash.from_records(records=texts)
+result = semhash.self_deduplicate()
+
+# Access deduplicated and duplicate records
+deduplicated_texts = result.selected
+duplicate_texts = result.filtered
+
+# View deduplication statistics
+print(f"Duplicate ratio: {result.duplicate_ratio}")
+print(f"Exact duplicate ratio: {result.exact_duplicate_ratio}")
+
+# Find edge cases to tune your threshold
+least_similar = result.get_least_similar_from_duplicates(n=5)
+
+# Adjust threshold without re-deduplicating
+result.rethreshold(0.95)
+
+# View each kept record with its duplicate cluster
+for item in result.selected_with_duplicates:
+    print(f"Kept: {item.record}")
+    print(f"Duplicates: {item.duplicates}")  # List of (duplicate_text, similarity_score)
+```
+
+### Key Attributes
+
+- **`selected`**: The deduplicated records that were kept
+- **`filtered`**: The records that were removed as duplicates, each with:
+  - `record`: The original record that was removed
+  - `exact`: Whether the record was an exact duplicate
+  - `duplicates`: A list of (record, similarity_score) pairs showing what it matched
+- **`duplicate_ratio`**: The ratio of duplicates found in the dataset
+- **`exact_duplicate_ratio`**: The ratio of exact duplicates found in the dataset
+
+### Key Methods
+
+- **`get_least_similar_from_duplicates(n)`**: Returns the n least similar records from the duplicates. This helps you find the right deduplication threshold by showing borderline cases.
+- **`rethreshold(threshold)`**: Re-applies the deduplication with a new threshold without rebuilding the index. This allows you to quickly adjust the sensitivity of the deduplication.
+- **`selected_with_duplicates`**: Returns each kept record along with its duplicate cluster, useful for understanding what was grouped together.
