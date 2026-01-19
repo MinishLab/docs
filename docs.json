@@ -14,6 +14,11 @@
       "dark": "#1a1a1a"
     }
   },
+  "analytics": {
+    "ga4": {
+      "measurementId": "G-LQWDNXKF2X"
+    }
+  },
   "navigation": {
     "tabs": [
       {
