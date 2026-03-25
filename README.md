@@ -28,6 +28,24 @@ Preview the production build locally:
 npm run preview
 ```
 
+## Blog Posts
+
+Add new posts in `src/content/docs/blog/` as `YYYY-MM-DD-slug.mdx`.
+
+Use this frontmatter:
+
+```mdx
+---
+title: "Post title"
+date: 2026-03-25
+authors:
+  - minish
+excerpt: "One short summary sentence for the blog index."
+---
+```
+
+The blog index is generated automatically from the files in that folder.
+
 ## Deployment
 
 The site is deployed with GitHub Pages via GitHub Actions on pushes to `main`.
