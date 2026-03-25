@@ -1,32 +1,33 @@
-# Mintlify Starter Kit
+# Minish Docs
 
-Click on `Use this template` to copy the Mintlify starter kit. The starter kit contains examples including
+This repository contains the Minish documentation site, built with Astro and Starlight.
 
-- Guide pages
-- Navigation
-- Customizations
-- API Reference pages
-- Use of popular components
+## Development
 
-### Development
+Install dependencies:
 
-Install the [Mintlify CLI](https://www.npmjs.com/package/mintlify) to preview the documentation changes locally. To install, use the following command
-
-```
-npm i -g mintlify
+```bash
+npm install
 ```
 
-Run the following command at the root of your documentation (where docs.json is)
+Start the local development server:
 
+```bash
+npm run dev
 ```
-mintlify dev
+
+Build the site:
+
+```bash
+npm run build
 ```
 
-### Publishing Changes
+Preview the production build locally:
 
-Install our Github App to auto propagate changes from your repo to your deployment. Changes will be deployed to production automatically after pushing to the default branch. Find the link to install on your dashboard. 
+```bash
+npm run preview
+```
 
-#### Troubleshooting
+## Deployment
 
-- Mintlify dev isn't running - Run `mintlify install` it'll re-install dependencies.
-- Page loads as a 404 - Make sure you are running in a folder with `docs.json`
+The site is deployed with GitHub Pages via GitHub Actions on pushes to `main`.

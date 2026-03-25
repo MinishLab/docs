@@ -1,0 +1,85 @@
+---
+title: Inference
+description: Create embeddings with Model2Vec
+sidebar:
+  icon: rocket
+---
+
+## Loading a Model
+
+To load a pre-trained model, you can use the `StaticModel.from_pretrained` method. This method allows you to load models from the Hugging Face Hub or from a local path.
+```python
+from model2vec import StaticModel
+
+model = StaticModel.from_pretrained("minishlab/potion-base-8M")
+```
+
+<details>
+<summary>Parameters</summary>
+
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `path` | `PathLike` | | The path to load your static model from. |
+| `token` | `str \| None` | `None` | The Hugging Face token to use when loading a private model. If not provided, no token is used. |
+| `normalize` | `bool \| None` | `None` | Whether to normalize the embeddings after loading. If `True`, embeddings will be normalized; if `False`, they won't. If `None`, the model's default behavior applies. |
+| `subfolder` | `str \| None` | `None` | The subfolder within the repository or local directory to load the model from. Leave as `None` to load from the root. |
+| `quantize_to` | `str \| DType \| None` | `None` | The data type to quantize the model to (e.g., `"float16"` or a `torch.dtype`). If a string is passed, it's converted to the corresponding `DType`. Set to `None` for no quantization. |
+| `dimensionality` | `int \| None` | `None` | The dimensionality to load the model at. If `None`, uses the model's inherent dimensionality. Useful when loading a model with reduced dimensions (e.g., trained via PCA or MRL). |
+
+</details>
+
+
+
+## Creating Mean Embeddings
+
+To create mean embeddings, you can use the `encode` method of the `StaticModel` class. This method allows you to encode a list of sentences into mean embeddings.
+```python
+from model2vec import StaticModel
+
+model = StaticModel.from_pretrained("minishlab/potion-base-8M")
+embeddings = model.encode(["Hello world", "Static embeddings are great!"])
+```
+
+
+<details>
+<summary>Parameters</summary>
+
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `sentences` | `Sequence[str]` | | The list of sentences to encode. You can also pass a single sentence. |
+| `show_progress_bar` | `bool` | `False` | Whether to show the progress bar. |
+| `max_length` | `int \| None` | `512` | The maximum length of the sentences. Any tokens beyond this length will be truncated. If this is None, no truncation is done. |
+| `batch_size` | `int` | `1024` | The batch size to use. |
+| `use_multiprocessing` | `bool` | `True` | Whether to use multiprocessing. By default, this is enabled for inputs > multiprocessing_threshold sentences and disabled otherwise. |
+| `multiprocessing_threshold` | `int` | `10000` | The threshold in number of sentences for using multiprocessing. |
+| `kwargs` | `Any` | | Any additional arguments. These are ignored. |
+
+</details>
+
+## Creating Sequence Embeddings
+To create sequence embeddings, you can use the `encode_as_sequence` method of the `StaticModel` class. This method allows you to encode a list of sentences into sequence embeddings, which are useful for tasks where you need a single embedding per token.
+
+```python
+from model2vec import StaticModel
+model = StaticModel.from_pretrained("minishlab/potion-base-8M")
+embeddings = model.encode_as_sequence(["Hello world", "Static embeddings are great!"], mode="sequence")
+```
+
+
+<details>
+<summary>Parameters</summary>
+
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `sentences` | `Sequence[str]` | | The list of sentences to encode. You can also pass a single sentence. |
+| `show_progress_bar` | `bool` | `False` | Whether to show the progress bar. |
+| `max_length` | `int \| None` | `512` | The maximum length of the sentences. Any tokens beyond this length will be truncated. If this is None, no truncation is done. |
+| `batch_size` | `int` | `1024` | The batch size to use. |
+| `use_multiprocessing` | `bool` | `True` | Whether to use multiprocessing. By default, this is enabled for inputs > multiprocessing_threshold sentences and disabled otherwise. |
+| `multiprocessing_threshold` | `int` | `10000` | The threshold in number of sentences for using multiprocessing. |
+| `kwargs` | `Any` | | Any additional arguments. These are ignored. |
+
+</details>
