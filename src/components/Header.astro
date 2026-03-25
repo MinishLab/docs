@@ -22,12 +22,17 @@ const navItems = [
   <div class="title-wrapper sl-flex">
     <SiteTitle {...Astro.props} />
   </div>
+  <nav class="mobile-site-nav md:sl-hidden" aria-label="Main">
+    {navItems.map(({ label, href, active }) => (
+      <a href={href} class:list={['nav-link', 'mobile-nav-link', { active }]}>{label}</a>
+    ))}
+  </nav>
   <nav class="site-nav sl-hidden md:sl-flex" aria-label="Main">
     {navItems.map(({ label, href, active }) => (
       <a href={href} class:list={['nav-link', { active }]}>{label}</a>
     ))}
   </nav>
-  <div class="search-wrapper sl-flex print:hidden">
+  <div class="search-wrapper sl-hidden md:sl-flex print:hidden">
     {shouldRenderSearch && <Search {...Astro.props} />}
   </div>
   <div class="right-group sl-hidden md:sl-flex print:hidden">
@@ -58,6 +63,22 @@ const navItems = [
     flex-shrink: 0;
     gap: 0.125rem;
     align-items: center;
+  }
+
+  .mobile-site-nav {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    gap: 0.35rem;
+    align-items: center;
+    overflow-x: auto;
+    padding-inline-end: 0.15rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .mobile-site-nav::-webkit-scrollbar {
+    display: none;
   }
 
   /* Search takes remaining space but is capped so right-group goes to far right */
@@ -96,6 +117,12 @@ const navItems = [
     text-decoration: none;
     white-space: nowrap;
     transition: background-color 0.15s, color 0.15s;
+  }
+
+  .mobile-nav-link {
+    flex-shrink: 0;
+    font-size: 0.82rem;
+    padding: 0.3rem 0.62rem;
   }
 
   .nav-link:hover,
