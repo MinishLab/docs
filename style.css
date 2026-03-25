@@ -1,0 +1,329 @@
+/* ───── NAVBAR STYLING ───── */
+
+/* 1) Always force the solid green behind #navbar */
+/* #navbar {
+    background-color: #22975e !important;
+    backdrop-filter: none !important;
+    opacity: 1 !important;
+  }
+   */
+  /* 2) When Mintlify adds the “scrolled” class, keep it exactly the same green */
+  #navbar.scrolled {
+    background-color: #22975e !important;
+    backdrop-filter: none !important;
+    opacity: 1 !important;
+  }
+  
+  /* 3) Also disable any ::before / ::after blurs on both states */
+  #navbar::before,
+  #navbar::after,
+  #navbar.scrolled::before,
+  #navbar.scrolled::after {
+    backdrop-filter: none !important;
+    opacity: 1 !important;
+  }
+  
+  /* 4) Restyle all navbar links for white/outline look */
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+  #navbar a {
+    font-family: 'Orbitron', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 1.1rem !important;
+    line-height: 1 !important;
+    color: #e6e4da !important;
+    padding: 0.75rem 1rem !important;
+  }
+  
+  /* 5) Invert the default .NavLink color so it stays readable on green */
+  #navbar .NavLink {
+    color: #f0efe8 !important;
+  }
+  #navbar .NavLink:hover,
+  #navbar .NavLink:focus {
+    background-color: rgba(240, 239, 232, 0.1) !important;
+    color: #ffffff !important;
+  }
+  
+  /* 6) Bangers font for any .logo-font usage */
+  @import url('https://fonts.googleapis.com/css2?family=Bangers&display=swap');
+
+  .logo-font {
+    font-family: 'Bangers', cursive !important;
+  }
+  
+  /* ───── CARD STYLING ───── */
+  
+  .card {
+    background-color: #22975e2c !important; /* very-light-green */
+    border: 2px solid rgba(0, 0, 0, 0.05) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+  }
+  
+  
+
+
+  
+  /* override only when <html class="dark"> is present */
+html.dark .card {
+    background-color: rgba(0, 149, 25, 0.171) !important;   /* darker wash */
+    border: 1px solid rgba(255, 255, 255, 0.214) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.30) !important;
+  }
+
+  
+  /* ───── BLOGPOST STYLING ───── */
+  
+  /* Container for each post entry */
+  .blog-post {
+
+    margin-bottom: 2rem;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  /* Post Title (Orbitron + green) */
+  .blog-post .post-title {
+    font-family: 'Bangers' !important;
+    color: #22975e !important;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    text-transform: capitalize;
+  }
+  
+  /* Post Date (bold, black) */
+  .blog-post .post-date {
+    font-weight: bold;
+    margin: 0 0 1rem 0;
+    font-size: 1rem;
+  }
+  
+  /* “Read More” link styling */
+  .blog-post .read-more {
+    color: #22975e !important;
+    font-weight: bold !important;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    font-size: 0.95rem;
+  }
+  
+  /* Separator line between posts */
+  .blog-post + hr {
+    border: none;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    margin: 2rem 0;
+  }
+  
+  /* Hover effect on the “Read More” link */
+  .blog-post .read-more:hover {
+    text-decoration: underline;
+    color: #1a5b43 !important; /* slightly darker green on hover */
+  }
+  
+  /* ───── Dark-mode text overrides ───── */
+  
+  /* Make each post’s title white in dark mode */
+  body.theme-dark .blog-post .post-title {
+    color: #ffffff !important;
+  }
+  
+  /* Make the post date light gray in dark mode */
+  body.theme-dark .blog-post .post-date {
+    color: #e0e0e0 !important;
+  }
+  
+  /* Make the summary paragraph off-white in dark mode */
+  body.theme-dark .blog-post .post-summary {
+    color: #f0f0f0 !important;
+  }
+  
+  /* Make the “READ MORE” link white in dark mode */
+  body.theme-dark .blog-post .read-more {
+    color: #ffffff !important;
+  }
+  
+  /* Slightly dim the “READ MORE” on hover in dark mode */
+  body.theme-dark .blog-post .read-more:hover {
+    color: #e0e0e0 !important;
+  }
+  
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  /* ─── WIDEN MINTLIFY’S CONTENT AREA ─── */
+
+/* 1) Target the div with id="content-area" directly */
+#content-area {
+    /*max-width: 1100px !important;*/
+    width: 100% !important;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  /* 2) In case Mintlify adds other wrappers inside, allow them to stretch too */
+  #content-area > div {
+    max-width: 100% !important;
+  }
+  
+  /* 3) If there is a “.prose” or similar inner container limiting width, override it as well */
+  .prose {
+    max-width: none !important;
+  }
+  
+
+
+  /* Hide Mintlify’s built‐in Blog/Docs sidebar so that #content‐area can truly span the full width */
+#content‐side‐layout {
+    display: none !important;
+  }
+
+
+
+/* ─── LOGO FONT OVERRIDE ─── */
+.logo-font {
+font-family: 'Bangers' !important;
+    font-size: clamp(5rem, 8vw + 1rem, 6.5rem); /* min - fluid - max */
+    letter-spacing: 0.05em !important; /* Optional: add slight letter spacing */
+    /* add an underline effect */
+
+}
+/* ---------- desktop / default ---------- */
+.logo-font {
+    margin-top: -5.5rem;   /* roughly what you had (-2 em) */
+  }
+  
+  /* ---------- phones & small tablets ---------- */
+  @media (max-width: 640px) {       /* tweak the breakpoint if you like */
+    .logo-font {
+        text-align: center !important; 
+      margin-top: -5.5rem;            /* lift it a little higher */
+    }
+  }
+
+
+/* light-mode (html *without* .dark)  */
+html:not(.dark) .logo-font {
+    color: #0b0b0bbe;        /* green */
+    
+  }
+  
+  /* dark-mode (html *with* .dark) */
+  html.dark .logo-font {
+    color: #e6e4da;        /* your light-on-dark tint */
+  }
+  
+
+/* ─── HERO TAGLINE STYLING ─── */
+/* ---------- desktop / default ---------- */
+.hero-tagline {
+    margin-top: -2em;          /* or trim it to -5em if it feels too tight */
+    font-size: 1.2rem;         /* 1.2 × the root (18 px) = 21.6 px */
+    line-height: 1.4;
+  }
+  
+  /* phones and small tablets */
+  @media (max-width: 640px) {
+    .hero-tagline {
+      margin-top: -1em;        /* pull it up, but only ~65 px instead of 150 px */
+    }
+  }
+
+
+
+
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bangers&display=swap');
+:root {
+    --font-inter: 'Bangers', sans-serif !important;
+}
+  
+html {
+    font-size: 18px !important;
+  }
+
+
+
+
+
+
+
+
+/* ─── VIGNETTE OVERLAY ─── */
+
+/* 1) We only want to show it in dark mode */
+html.dark::before,
+html[data-theme="dark"]::before {
+  /* absolutely cover the entire viewport */
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;       /* so you can still click links normally */
+  z-index: -1;                /* sit behind everything else */
+
+  /* 2) radial gradient: 
+     - center is fully transparent
+     - edges fade to a very subtle near-black (rgba(0,0,0,0.6) is plenty)
+     You can tweak the color stops/distance if you want a stronger or weaker effect. */
+  background: radial-gradient(
+    circle at center,
+    rgba(0, 0, 0, 0)   50%,    /* 50% of the radius—still transparent */
+    rgba(0, 0, 0, 0.6) 100%    /* near-black by the time you hit the edge */
+  );
+}
+
+/* 3) Make sure that the plain dark‐background color still sits underneath.
+   We do this by re-stating your original dark page background 
+   directly on html.dark (so the gradient is laid on top of #1a1a1a). */
+html.dark {
+  background-color: #1a1a1a !important;
+}
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.cta-row {
+    display: flex;
+    flex-wrap: wrap;      /* if you want them to stack on very small screens */
+    gap: 2rem;            /* ← controls the exact space between the two links */
+    margin-top: 1rem;     /* optional: push the row down a bit */
+    margin-bottom: 1rem;
+  }
+  
+  /* (optional) if you want them to stack on mobile: */
+  @media (max-width: 500px) {
+    .cta-row {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+  }
+  
+
+
+
+

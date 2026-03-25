@@ -1,7 +1,6 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "willow",
-  "css": "/assets/overrides.css",
   "name": "Minish Blog & Documentation",
   "colors": {
     "primary": "#16A34A",
