@@ -22,7 +22,7 @@ const navItems = [
   <div class="title-wrapper sl-flex">
     <SiteTitle {...Astro.props} />
   </div>
-  <nav class="mobile-site-nav md:sl-hidden" aria-label="Main">
+  <nav class="mobile-site-nav sl-flex md:sl-hidden" aria-label="Main">
     {navItems.map(({ label, href, active }) => (
       <a href={href} class:list={['nav-link', 'mobile-nav-link', { active }]}>{label}</a>
     ))}
@@ -66,7 +66,6 @@ const navItems = [
   }
 
   .mobile-site-nav {
-    display: flex;
     flex: 1;
     min-width: 0;
     gap: 0.35rem;
