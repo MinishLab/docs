@@ -1,0 +1,32 @@
+---
+import {
+  formatCompactNumber,
+  formatExactNumber,
+  getHomepageTotals,
+} from '../../data/homepageMetrics';
+
+const totals = await getHomepageTotals();
+---
+
+<div class="hero-proof" aria-label="Open-source totals">
+  <div
+    class="hero-proof-chip"
+    title={`${formatExactNumber(totals.stars)} GitHub stars across Minish packages`}
+  >
+    <span class="hero-proof-icon hero-proof-icon-github" aria-hidden="true"></span>
+    <span class="hero-proof-copy">
+      <span class="hero-proof-value">{formatCompactNumber(totals.stars)}+</span>
+      <span class="hero-proof-label">GitHub stars</span>
+    </span>
+  </div>
+  <span
+    class="hero-proof-chip hero-proof-chip-muted"
+    title={`${formatExactNumber(totals.downloads)} package downloads across Minish packages`}
+  >
+    <span class="hero-proof-icon hero-proof-icon-downloads" aria-hidden="true"></span>
+    <span class="hero-proof-copy">
+      <span class="hero-proof-value">{formatCompactNumber(totals.downloads)}+</span>
+      <span class="hero-proof-label">Package downloads</span>
+    </span>
+  </span>
+</div>
