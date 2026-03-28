@@ -4,6 +4,8 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1'
 
 permissions:
   contents: read
@@ -22,6 +24,9 @@ jobs:
         uses: actions/checkout@v5
       - name: Install, build, and upload site
         uses: withastro/action@v5
+        env:
+          MINISH_GITHUB_TOKEN: ${{ secrets.MINISH_GITHUB_TOKEN }}
+          PEPY_API_KEY: ${{ secrets.PEPY_API_KEY }}
 
   deploy:
     needs: build
