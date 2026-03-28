@@ -1,0 +1,54 @@
+---
+import {
+  formatCompactNumber,
+  formatExactNumber,
+  getHomepagePackageMetrics,
+} from '../../data/homepageMetrics';
+
+const packages = await getHomepagePackageMetrics();
+---
+
+<div class="pkg-list">
+  {packages.map((pkg) => (
+    <div class="pkg-row">
+      <div class="pkg-row-main">
+        <a href={pkg.docsHref} class="pkg-icon-link" aria-label={`${pkg.name} docs`}>
+          <span class="pkg-icon-wrap">
+            <img class="pkg-icon" src={pkg.logoSrc} alt={pkg.logoAlt} loading="lazy" />
+          </span>
+        </a>
+        <a href={pkg.docsHref} class="pkg-row-info">
+          <div class="pkg-text">
+            <span class="pkg-name">{pkg.name}</span>
+            <span class="pkg-desc">{pkg.description}</span>
+          </div>
+        </a>
+        <div class="pkg-row-meta">
+          <a href={pkg.docsHref} class="pkg-chip pkg-chip-docs">Docs</a>
+          <a
+            href={pkg.githubHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="pkg-chip pkg-chip-stat"
+            title={`${formatExactNumber(pkg.stars)} GitHub stars`}
+          >
+            <span class="pkg-chip-icon pkg-chip-icon-github" aria-hidden="true"></span>
+            <span class="pkg-chip-label">Stars</span>
+            <span class="pkg-chip-value">{formatCompactNumber(pkg.stars)}</span>
+          </a>
+          <a
+            href={pkg.downloadsHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="pkg-chip pkg-chip-stat"
+            title={`${formatExactNumber(pkg.downloads)} package downloads`}
+          >
+            <span class="pkg-chip-icon pkg-chip-icon-downloads" aria-hidden="true"></span>
+            <span class="pkg-chip-label">Downloads</span>
+            <span class="pkg-chip-value">{formatCompactNumber(pkg.downloads)}</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  ))}
+</div>
