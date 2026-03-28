@@ -103,14 +103,20 @@ type PepyResponse = {
   total_downloads?: number;
 };
 
+type HuggingFaceModelResponse = {
+  downloads?: number;
+};
+
 const PEPY_API_KEY = import.meta.env.PEPY_API_KEY;
 const GITHUB_TOKEN = import.meta.env.MINISH_GITHUB_TOKEN;
 const REQUEST_HEADERS = {
   Accept: 'application/json',
   'User-Agent': 'minish-docs-build',
 };
+const HUGGING_FACE_AUTHOR = 'minishlab';
 
 let homepageMetricsPromise: Promise<HomepagePackageMetrics[]> | undefined;
+let huggingFaceMonthlyDownloadsPromise: Promise<number | undefined> | undefined;
 
 async function fetchJson<T>(url: string, extraHeaders: Record<string, string> = {}) {
   const response = await fetch(url, {
@@ -153,6 +159,19 @@ async function fetchDownloads(source: DownloadSource) {
   return typeof data.total_downloads === 'number' ? data.total_downloads : undefined;
 }
 
+async function fetchHuggingFaceMonthlyDownloads() {
+  const params = new URLSearchParams({
+    author: HUGGING_FACE_AUTHOR,
+    limit: '100',
+    full: 'true',
+  });
+  const models = await fetchJson<HuggingFaceModelResponse[]>(
+    `https://huggingface.co/api/models?${params.toString()}`,
+  );
+
+  return models.reduce((sum, model) => sum + (model.downloads ?? 0), 0);
+}
+
 async function resolvePackageMetrics(pkg: HomepagePackageDefinition): Promise<HomepagePackageMetrics> {
   const [stars, downloads] = await Promise.all([
     fetchGithubStars(pkg.githubRepo).catch(() => undefined),
@@ -172,13 +191,23 @@ export async function getHomepagePackageMetrics() {
 }
 
 export async function getHomepageTotals() {
-  const packages = await getHomepagePackageMetrics();
+  const [packages, monthlyModelDownloads] = await Promise.all([
+    getHomepagePackageMetrics(),
+    (huggingFaceMonthlyDownloadsPromise ??=
+      fetchHuggingFaceMonthlyDownloads().catch(() => undefined)),
+  ]);
+
   return packages.reduce(
     (totals, pkg) => ({
       stars: totals.stars + pkg.stars,
       downloads: totals.downloads + pkg.downloads,
+      monthlyModelDownloads: totals.monthlyModelDownloads,
     }),
-    { stars: 0, downloads: 0 },
+    {
+      stars: 0,
+      downloads: 0,
+      monthlyModelDownloads,
+    },
   );
 }
 
