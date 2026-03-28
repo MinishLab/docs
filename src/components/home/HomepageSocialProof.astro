@@ -29,4 +29,16 @@ const totals = await getHomepageTotals();
       <span class="hero-proof-label">Package downloads</span>
     </span>
   </span>
+  {typeof totals.monthlyModelDownloads === 'number' && totals.monthlyModelDownloads > 0 && (
+    <span
+      class="hero-proof-chip hero-proof-chip-hf"
+      title={`${formatExactNumber(totals.monthlyModelDownloads)} model downloads in the last 30 days on Hugging Face`}
+    >
+      <span class="hero-proof-icon hero-proof-icon-downloads" aria-hidden="true"></span>
+      <span class="hero-proof-copy">
+        <span class="hero-proof-value">{formatCompactNumber(totals.monthlyModelDownloads)}+</span>
+        <span class="hero-proof-label">Monthly model downloads</span>
+      </span>
+    </span>
+  )}
 </div>

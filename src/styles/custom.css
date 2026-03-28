@@ -148,6 +148,12 @@ main:has(.pkg-list) .hero {
     rgba(74, 82, 70, 0.045);
 }
 
+.hero-proof-chip-hf {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.04) 100%),
+    rgba(34, 151, 94, 0.045);
+}
+
 .hero-proof-copy {
   display: flex;
   flex-direction: column;
@@ -220,6 +226,12 @@ main:has(.pkg-list) .hero {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.014) 0%, rgba(255, 255, 255, 0) 100%),
     rgba(226, 236, 228, 0.024);
+}
+
+[data-theme='dark'] .hero-proof-chip-hf {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.014) 0%, rgba(255, 255, 255, 0) 100%),
+    rgba(126, 216, 148, 0.03);
 }
 
 [data-theme='dark'] .hero-proof-value {
@@ -917,6 +929,11 @@ main:has(.pkg-list) .hero {
   .hero-proof-label {
     font-size: 0.68rem;
     line-height: 1.15;
+  }
+
+  .hero-proof-chip-hf {
+    grid-column: 1 / -1;
+    justify-self: start;
   }
 
   .pkg-row {
