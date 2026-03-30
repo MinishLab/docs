@@ -3,6 +3,7 @@ import starlight from '@astrojs/starlight';
 import starlightBlog from 'starlight-blog';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
   site: 'https://minish.ai',
@@ -10,6 +11,7 @@ export default defineConfig({
     '/packages': '/packages/overview/',
   },
   integrations: [
+    sitemap(),
     starlight({
       title: 'Minish',
       components: {
@@ -23,6 +25,22 @@ export default defineConfig({
       },
       favicon: '/logo/minish_logo.png',
       customCss: ['./src/styles/custom.css'],
+      head: [
+        {
+          tag: 'script',
+          attrs: {
+            src: 'https://www.googletagmanager.com/gtag/js?id=G-LQWDNXKF2X',
+            async: true,
+          },
+        },
+        {
+          tag: 'script',
+          content: `window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-LQWDNXKF2X');`,
+        },
+      ],
       social: [
         { icon: 'github', label: 'GitHub', href: 'https://github.com/minishlab' },
         { icon: 'linkedin', label: 'LinkedIn', href: 'https://linkedin.com/company/minish-lab' },
