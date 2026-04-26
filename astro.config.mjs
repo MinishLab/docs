@@ -95,6 +95,16 @@ gtag('config', 'G-LQWDNXKF2X');`,
               ],
             },
             {
+              label: 'Semble',
+              items: [
+                { label: 'Introduction',  link: '/packages/semble/introduction/' },
+                { label: 'Installation',  link: '/packages/semble/installation/' },
+                { label: 'Usage',         link: '/packages/semble/usage/' },
+                { label: 'MCP Server',    link: '/packages/semble/mcp-server/' },
+                { label: 'Benchmarks',    link: '/packages/semble/benchmarks/' },
+              ],
+            },
+            {
               label: 'Tokenlearn',
               items: [
                 { label: 'Usage', link: '/packages/tokenlearn/usage/' },

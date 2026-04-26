@@ -1,0 +1,37 @@
+---
+title: Installation
+description: How to install Semble
+sidebar:
+  icon: seti:config
+---
+
+## Requirements
+
+- Python 3.9 or higher
+- No GPU, API keys, or external services required — runs fully on CPU
+
+## Install
+
+```bash
+pip install semble
+```
+
+Or with [uv](https://docs.astral.sh/uv/):
+
+```bash
+uv add semble
+```
+
+## MCP Server Extra
+
+To use Semble as an [MCP server](/packages/semble/mcp-server/) with agents like Claude Code, Cursor, or OpenCode, install the `mcp` extra:
+
+```bash
+pip install "semble[mcp]"
+```
+
+Or, use [uvx](https://docs.astral.sh/uv/guides/tools/) to run it without a permanent install:
+
+```bash
+uvx --from "semble[mcp]" semble
+```

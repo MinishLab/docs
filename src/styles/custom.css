@@ -571,9 +571,16 @@ main:has(.pkg-list) .hero {
   object-fit: contain;
   object-position: center;
   display: block;
-  transform: scale(1.58);
+  transform: scale(1.46);
   transform-origin: center;
 }
+
+.pkg-icon--model2vec    { transform: scale(1.8); }
+.pkg-icon--semhash      { transform: scale(1.6); }
+.pkg-icon--vicinity     { transform: scale(1.8); }
+.pkg-icon--semble       { transform: scale(1.46); }
+.pkg-icon--tokenlearn   { transform: scale(1.7); }
+.pkg-icon--model2vec-rs { transform: scale(1.7); }
 
 .pkg-text {
   display: flex;
