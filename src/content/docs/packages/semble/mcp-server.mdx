@@ -1,0 +1,69 @@
+---
+title: MCP Server
+description: Using Semble as an MCP server with AI agents
+sidebar:
+  icon: puzzle
+---
+
+Semble can run as an [MCP](https://modelcontextprotocol.io/) server so agents can search any codebase directly. Repos are cloned and indexed on demand, and indexes are cached for the lifetime of the session.
+
+> **Requires [uv](https://docs.astral.sh/uv/getting-started/installation/) to be installed.**
+
+## Setup
+
+### Claude Code
+
+```bash
+claude mcp add semble -s user -- uvx --from "semble[mcp]" semble
+```
+
+### OpenCode
+
+Add to `~/.opencode/config.json`:
+
+```json
+{
+  "mcp": {
+    "semble": {
+      "type": "local",
+      "command": ["uvx", "--from", "semble[mcp]", "semble"]
+    }
+  }
+}
+```
+
+### Cursor
+
+Add to `~/.cursor/mcp.json` (or `.cursor/mcp.json` in your project):
+
+```json
+{
+  "mcpServers": {
+    "semble": {
+      "command": "uvx",
+      "args": ["--from", "semble[mcp]", "semble"]
+    }
+  }
+}
+```
+
+### Codex
+
+Add to `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.semble]
+command = "uvx"
+args = ["--from", "semble[mcp]", "semble"]
+```
+
+## Tools
+
+Once connected, the agent has access to two tools:
+
+| Tool | Description |
+|------|-------------|
+| `search` | Search a codebase with a natural-language or code query. Pass `repo` as a git URL or local path to index it on demand. |
+| `find_related` | Given a `file_path` and `line` number from a prior search result, return chunks semantically similar to the code at that location. |
+
+Both tools accept a `repo` parameter (git URL or local path). The index is built on the first call and reused for subsequent calls in the same session.

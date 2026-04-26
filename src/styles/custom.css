@@ -571,7 +571,7 @@ main:has(.pkg-list) .hero {
   object-fit: contain;
   object-position: center;
   display: block;
-  transform: scale(1.58);
+  transform: scale(1.46);
   transform-origin: center;
 }
 
