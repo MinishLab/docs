@@ -575,6 +575,13 @@ main:has(.pkg-list) .hero {
   transform-origin: center;
 }
 
+.pkg-icon--model2vec    { transform: scale(1.8); }
+.pkg-icon--semhash      { transform: scale(1.6); }
+.pkg-icon--vicinity     { transform: scale(1.8); }
+.pkg-icon--semble       { transform: scale(1.46); }
+.pkg-icon--tokenlearn   { transform: scale(1.7); }
+.pkg-icon--model2vec-rs { transform: scale(1.7); }
+
 .pkg-text {
   display: flex;
   flex-direction: column;

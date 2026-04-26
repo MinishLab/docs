@@ -14,7 +14,7 @@ const packages = await getHomepagePackageMetrics();
       <div class="pkg-row-main">
         <a href={pkg.docsHref} class="pkg-icon-link" aria-label={`${pkg.name} docs`}>
           <span class="pkg-icon-wrap">
-            <img class="pkg-icon" src={pkg.logoSrc} alt={pkg.logoAlt} loading="lazy" />
+            <img class={`pkg-icon pkg-icon--${pkg.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`} src={pkg.logoSrc} alt={pkg.logoAlt} loading="lazy" />
           </span>
         </a>
         <a href={pkg.docsHref} class="pkg-row-info">
