@@ -34,14 +34,6 @@ for result in results:
     print()
 ```
 
-Semble supports three query styles:
-
-| Style | Example |
-|-------|---------|
-| Natural language | `"save model to disk"` |
-| Architecture | `"error handling middleware"` |
-| Symbol lookup | `"getUserById"`, `"Config::load"` |
-
 ## Finding Related Code
 
 Given any search result, find other chunks that are semantically similar to it:
@@ -54,7 +46,7 @@ for r in related:
     print(r.chunk.file_path, r.chunk.start_line)
 ```
 
-This is useful for exploring implementations — start from one function and surface the code that uses or resembles it.
+This is useful for exploring implementations. Start from one function and surface the code that uses or resembles it.
 
 ## Search Modes
 
