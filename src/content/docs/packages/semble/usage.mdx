@@ -21,6 +21,28 @@ index = SembleIndex.from_git("https://github.com/MinishLab/model2vec")
 
 Indexing a full repo typically takes under 300 ms. Remote repos are cloned on first use and cached for the lifetime of the process.
 
+### Advanced options
+
+Both `from_path` and `from_git` accept optional parameters to control what gets indexed:
+
+```python
+index = SembleIndex.from_path(
+    "./my-project",
+    extensions=frozenset({".py", ".ts"}),        # only index these file types
+    ignore=frozenset({"dist", "node_modules"}),  # skip these directories
+    include_text_files=True,                     # also index .md, .yaml, .json, etc.
+)
+```
+
+`from_git` additionally accepts a `ref` parameter to check out a specific branch or tag:
+
+```python
+index = SembleIndex.from_git(
+    "https://github.com/MinishLab/model2vec",
+    ref="v2.0.0",  # branch or tag; defaults to the remote HEAD
+)
+```
+
 ## Searching
 
 Search the index with a natural-language description or a code snippet:
@@ -32,6 +54,18 @@ for result in results:
     print(result.chunk.file_path, result.chunk.start_line)
     print(result.chunk.content)
     print()
+```
+
+### Filtering
+
+Restrict results to specific languages or files using `filter_languages` and `filter_paths`:
+
+```python
+# Only return results from Python files
+results = index.search("parse config", filter_languages=["python"])
+
+# Only return results from specific files
+results = index.search("parse config", filter_paths=["src/config.py", "src/settings.py"])
 ```
 
 ## Finding Related Code
@@ -75,4 +109,17 @@ result.chunk.file_path    # "src/config.py"
 result.chunk.start_line   # 42
 result.chunk.end_line     # 67
 result.chunk.content      # raw source code of the chunk
+```
+
+## Index Stats
+
+Inspect the state of an index with the `stats` property:
+
+```python
+stats = index.stats
+
+stats.indexed_files   # number of files indexed
+stats.total_chunks    # total number of chunks
+stats.languages       # dict mapping language name to chunk count
+                      # e.g. {"python": 412, "typescript": 88}
 ```
