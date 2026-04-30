@@ -60,10 +60,10 @@ Semble splits each file into code-aware chunks using [Chonkie](https://github.co
 
 The two score lists are fused with Reciprocal Rank Fusion (RRF) and then reranked with a set of code-aware signals:
 
-- **Adaptive weighting** — symbol-like queries (`Foo::bar`, `getUserById`) get more lexical weight; natural-language queries stay balanced.
-- **Definition boosts** — a chunk that defines the queried symbol (`class`, `def`, `func`) ranks above chunks that merely reference it.
-- **Identifier stems** — query tokens are stemmed and matched against identifier stems, so `parse config` boosts chunks containing `parseConfig`, `ConfigParser`, or `config_parser`.
-- **File coherence** — when multiple chunks from the same file match, the file is boosted so the top result reflects broad file-level relevance.
-- **Noise penalties** — test files, `compat`/`legacy` shims, example code, and `.d.ts` stubs are down-ranked so canonical implementations surface first.
+- **Adaptive weighting**: symbol-like queries (`Foo::bar`, `getUserById`) get more lexical weight; natural-language queries stay balanced.
+- **Definition boosts**: a chunk that defines the queried symbol (`class`, `def`, `func`) ranks above chunks that merely reference it.
+- **Identifier stems**: query tokens are stemmed and matched against identifier stems, so `parse config` boosts chunks containing `parseConfig`, `ConfigParser`, or `config_parser`.
+- **File coherence**: when multiple chunks from the same file match, the file is boosted so the top result reflects broad file-level relevance.
+- **Noise penalties**: test files, `compat`/`legacy` shims, example code, and `.d.ts` stubs are down-ranked so canonical implementations surface first.
 
 Because the embedding model is static with no transformer forward pass at query time, all of this runs in milliseconds on CPU.
