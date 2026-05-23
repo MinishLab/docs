@@ -26,9 +26,11 @@ Using another agent harness? See [MCP Server](/packages/semble/mcp-server/) for 
 [Install Semble](/packages/semble/installation/), then add the [AGENTS.md snippet](/packages/semble/usage/#agentsmd-snippet) to your `AGENTS.md`, `CLAUDE.md`, or equivalent. This works for any agent and is the only option for sub-agents, which typically cannot call MCP tools directly.
 
 ```bash
-pip install semble       # Install with pip
-uv tool install semble   # Or install with uv
+uv tool install semble   # Install with uv (recommended)
+pip install semble       # Or install with pip
 ```
+
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/) if you don't have it yet.
 
 ## Main Features
 
