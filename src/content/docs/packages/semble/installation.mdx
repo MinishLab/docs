@@ -26,7 +26,11 @@ uv tool install semble   # Recommended
 pip install semble       # Or with pip
 ```
 
-This gives you the [`semble` CLI](/packages/semble/usage/), which is also what you'll wire into [AGENTS.md](/packages/semble/usage/#agentsmd-snippet) so any agent (including sub-agents) can use it.
+This gives you the [`semble` CLI](/packages/semble/usage/).
+
+### Optional: wire it into AGENTS.md
+
+Once installed, drop the [AGENTS.md snippet](/packages/semble/usage/#agentsmd-snippet) into your `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, or equivalent. This teaches any agent (including sub-agents) when to reach for `semble` instead of grep, and is the only setup needed for harnesses without MCP support.
 
 ## 2. MCP Server
 
