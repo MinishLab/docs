@@ -5,7 +5,7 @@ sidebar:
   icon: seti:config
 ---
 
-There are three things you may want to set up. We recommend doing all three, but you can pick and choose based on your needs:
+There are three things you can do to install Semble, which are independent of eachother. We recommend doing all three, but you can pick and choose based on your needs:
 
 1. [Install Semble](#1-install-semble) (for the CLI and AGENTS.md flow).
 2. [Set up the MCP server](#2-mcp-server) (so your top-level agent can call Semble as a tool).
@@ -30,7 +30,7 @@ This gives you the [`semble` CLI](/packages/semble/usage/), which is also what y
 
 ## 2. MCP Server
 
-To run Semble as an [MCP server](/packages/semble/mcp-server/) with agents like Claude Code, Cursor, or OpenCode, you don't need a permanent install — [`uvx`](https://docs.astral.sh/uv/guides/tools/) will run it on demand. For Claude Code:
+Install Semble as an [MCP server](/packages/semble/mcp-server/) for Claude Code:
 
 ```bash
 claude mcp add semble -s user -- uvx --from "semble[mcp]" semble
