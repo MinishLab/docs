@@ -1,37 +1,62 @@
 ---
 title: Installation
-description: How to install Semble
+description: Install Semble, set up the MCP server, and scaffold a sub-agent
 sidebar:
   icon: seti:config
 ---
 
+There are three things you may want to set up. We recommend doing all three, but you can pick and choose based on your needs:
+
+1. [Install Semble](#1-install-semble) (for the CLI and AGENTS.md flow).
+2. [Set up the MCP server](#2-mcp-server) (so your top-level agent can call Semble as a tool).
+3. [Install the sub-agent](#3-sub-agent) (so sub-agents, which can't call MCP tools, can still search).
+
 ## Requirements
 
-- Python 3.10 or higher
+- Python 3.10 or higher.
+- [uv](https://docs.astral.sh/uv/getting-started/installation/) (recommended for all three flows).
 - No GPU, API keys, or external services required. Runs fully on CPU.
 
-## Install
+## 1. Install Semble
+
+Install Semble with [`uv`](https://docs.astral.sh/uv/) (recommended) or `pip`:
 
 ```bash
-pip install semble
+uv tool install semble   # Recommended
+pip install semble       # Or with pip
 ```
 
-Or with [uv](https://docs.astral.sh/uv/):
+This gives you the [`semble` CLI](/packages/semble/usage/), which is also what you'll wire into [AGENTS.md](/packages/semble/usage/#agentsmd-snippet) so any agent (including sub-agents) can use it.
+
+## 2. MCP Server
+
+To run Semble as an [MCP server](/packages/semble/mcp-server/) with agents like Claude Code, Cursor, or OpenCode, you don't need a permanent install — [`uvx`](https://docs.astral.sh/uv/guides/tools/) will run it on demand. For Claude Code:
 
 ```bash
-uv add semble
+claude mcp add semble -s user -- uvx --from "semble[mcp]" semble
 ```
 
-## MCP Server Extra
+For other agents (Cursor, Codex, OpenCode, VS Code, Copilot CLI, Windsurf, Gemini, Kiro, Zed), see [MCP Server](/packages/semble/mcp-server/) for the per-harness config snippet.
 
-To use Semble as an [MCP server](/packages/semble/mcp-server/) with agents like Claude Code, Cursor, or OpenCode, install the `mcp` extra:
+## 3. Sub-agent
+
+Sub-agents typically cannot call MCP tools directly. To give a sub-agent access to Semble, run `semble init` once in your project root to scaffold a dedicated search sub-agent for your harness:
 
 ```bash
-pip install "semble[mcp]"
+semble init                      # Claude Code  → .claude/agents/semble-search.md
+semble init --agent gemini       # Gemini CLI   → .gemini/agents/semble-search.md
+semble init --agent cursor       # Cursor       → .cursor/agents/semble-search.md
+semble init --agent opencode     # OpenCode     → .opencode/agents/semble-search.md
+semble init --agent copilot      # Copilot CLI  → .github/agents/semble-search.md
+semble init --agent kiro         # Kiro         → .kiro/agents/semble-search.md
 ```
 
-Or, use [uvx](https://docs.astral.sh/uv/guides/tools/) to run it without a permanent install:
+If `semble` is not on `$PATH`, prefix the command with `uvx --from "semble[mcp]"`.
+
+## Updating Semble
 
 ```bash
-uvx --from "semble[mcp]" semble
+uv tool upgrade semble         # with uv
+pip install --upgrade semble   # with pip
+uv cache clean semble          # for MCP users (restart your MCP client after)
 ```

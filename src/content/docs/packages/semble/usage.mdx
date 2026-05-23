@@ -1,125 +1,144 @@
 ---
-title: Usage
-description: Using Semble to index and search codebases
+title: CLI / AGENTS.md
+description: Invoke Semble from the shell or wire it into AGENTS.md for any agent
 sidebar:
-  icon: puzzle
+  icon: seti:shell
 ---
 
-## Indexing
+Semble ships as a standalone CLI. This is the best fit for sub-agents (which typically cannot call MCP tools directly), scripts, and anywhere you want search results without an MCP session. It also pairs nicely with [MCP](/packages/semble/mcp-server/) for the top-level agent.
 
-Create an index from a local directory or a remote git repository:
+[Install Semble](/packages/semble/installation/) first:
+
+```bash
+pip install semble       # with pip
+uv tool install semble   # with uv
+```
+
+## CLI
+
+```bash
+# Search a local repo
+semble search "authentication flow" ./my-project
+
+# Search for a symbol or identifier
+semble search "save_pretrained" ./my-project
+
+# Search a remote repo (cloned on demand)
+semble search "save model to disk" https://github.com/MinishLab/model2vec
+
+# Limit results
+semble search "save model to disk" ./my-project --top-k 10
+
+# Search docs and prose (markdown, rst, etc.) instead of code
+semble search "deployment guide" ./my-project --content docs
+
+# Search config files (yaml, toml, terraform, etc.)
+semble search "database host port" ./my-project --content config
+
+# Search everything (code, docs, and config)
+semble search "authentication" ./my-project --content all
+
+# Find code similar to a known location
+semble find-related src/auth.py 42 ./my-project
+```
+
+`--content` accepts `code` (default), `docs`, `config`, or `all`. `path` defaults to the current directory when omitted; git URLs are accepted. If `semble` is not on `$PATH`, use `uvx --from "semble[mcp]" semble` in its place.
+
+## AGENTS.md snippet
+
+Append the snippet below to your `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, or equivalent so the agent knows when to reach for Semble instead of grep:
+
+````markdown
+## Code Search
+
+Use `semble search` to find code by describing what it does or naming a symbol/identifier, instead of grep:
+
+```bash
+semble search "authentication flow" ./my-project
+semble search "save_pretrained" ./my-project
+semble search "save model to disk" ./my-project --top-k 10
+```
+
+Use `--content docs` to search documentation and prose, `--content config` for config files (yaml, toml, etc.), or `--content all` to search code, docs, and config:
+
+```bash
+semble search "deployment guide" ./my-project --content docs
+semble search "database host port" ./my-project --content config
+semble search "authentication" ./my-project --content all
+```
+
+Use `semble find-related` to discover code similar to a known location (pass `file_path` and `line` from a prior search result):
+
+```bash
+semble find-related src/auth.py 42 ./my-project
+```
+
+`path` defaults to the current directory when omitted; git URLs are accepted. If `semble` is not on `$PATH`, use `uvx --from "semble[mcp]" semble` in its place.
+
+### Workflow
+
+1. Start with `semble search` to find relevant chunks.
+2. Use `--content docs` for documentation, `--content config` for config files, or `--content all` for everything.
+3. Inspect full files only when the returned chunk is not enough context.
+4. Optionally use `semble find-related` with a promising result's `file_path` and `line` to discover related implementations.
+5. Use grep only when you need exhaustive literal matches or quick confirmation of an exact string.
+````
+
+For agents that support dedicated sub-agents (Claude Code, Gemini, Cursor, OpenCode, Copilot CLI, Kiro), `semble init` can scaffold one for you — see [Installation → Sub-agent](/packages/semble/installation/#3-sub-agent).
+
+## Token savings
+
+`semble savings` shows how many tokens Semble has saved across all your searches:
+
+```bash
+semble savings           # summary by period
+semble savings --verbose # also show breakdown by call type
+```
+
+```
+  Semble Token Savings
+  ════════════════════════════════════════════════════════════════
+  Period        Calls   Savings
+  ────────────────────────────────────────────────────────────────
+  Today         42      [███████████████░]  ~58.4k tokens (95%)
+  Last 7 days   287     [██████████████░░]  ~312.4k tokens (90%)
+  All time      1.4k    [██████████████░░]  ~1.2M tokens (89%)
+```
+
+For each call, Semble records the total character count of the unique files containing returned chunks and the character count of the snippets returned. Estimated tokens saved is `(file chars − snippet chars) / 4` (4 chars per token). This is a conservative estimate: the baseline is reading matched files in full, which is how coding agents often explore unfamiliar code. Stats are stored in `~/.semble/savings.jsonl`.
+
+## Library usage
+
+Semble can also be used as a Python library for programmatic access, useful when building custom tooling or integrating search directly into your own code.
 
 ```python
-from semble import SembleIndex
+from semble import ContentType, SembleIndex
 
-# Index a local directory
+# Index a local directory (code only, the default)
 index = SembleIndex.from_path("./my-project")
 
-# Index a remote git repository (cloned and cached locally)
-index = SembleIndex.from_git("https://github.com/MinishLab/model2vec")
-```
+# Index docs and prose (markdown, rst, etc.)
+index = SembleIndex.from_path("./my-project", content=ContentType.DOCS)
 
-Indexing a full repo typically takes under 300 ms. Remote repos are cloned on first use and cached for the lifetime of the process.
-
-### Advanced options
-
-Both `from_path` and `from_git` accept optional parameters to control what gets indexed:
-
-```python
+# Index everything (code, docs, and config)
 index = SembleIndex.from_path(
     "./my-project",
-    extensions=frozenset({".py", ".ts"}),        # only index these file types
-    ignore=frozenset({"dist", "node_modules"}),  # skip these directories
-    include_text_files=True,                     # also index .md, .yaml, .json, etc.
+    content=[ContentType.CODE, ContentType.DOCS, ContentType.CONFIG],
 )
-```
 
-`from_git` additionally accepts a `ref` parameter to check out a specific branch or tag:
+# Index a remote git repository
+index = SembleIndex.from_git("https://github.com/MinishLab/model2vec")
 
-```python
-index = SembleIndex.from_git(
-    "https://github.com/MinishLab/model2vec",
-    ref="v2.0.0",  # branch or tag; defaults to the remote HEAD
-)
-```
+# Search the index with a natural-language or code query
+results = index.search("save model to disk", top_k=3)
 
-## Searching
+# Find code similar to a specific result
+related = index.find_related(results[0], top_k=3)
 
-Search the index with a natural-language description or a code snippet:
-
-```python
-results = index.search("save model to disk", top_k=5)
-
-for result in results:
-    print(result.chunk.file_path, result.chunk.start_line)
-    print(result.chunk.content)
-    print()
-```
-
-### Filtering
-
-Restrict results to specific languages or files using `filter_languages` and `filter_paths`:
-
-```python
-# Only return results from Python files
-results = index.search("parse config", filter_languages=["python"])
-
-# Only return results from specific files
-results = index.search("parse config", filter_paths=["src/config.py", "src/settings.py"])
-```
-
-## Finding Related Code
-
-Given any search result, find other chunks that are semantically similar to it:
-
-```python
-results = index.search("tokenizer encode", top_k=1)
-related = index.find_related(results[0], top_k=5)
-
-for r in related:
-    print(r.chunk.file_path, r.chunk.start_line)
-```
-
-This is useful for exploring implementations. Start from one function and surface the code that uses or resembles it.
-
-## Search Modes
-
-The `mode` parameter controls the retrieval strategy:
-
-```python
-# Default: hybrid (BM25 + semantic, recommended)
-results = index.search("parse config", mode="hybrid")
-
-# Semantic only (best for natural-language queries)
-results = index.search("parse config", mode="semantic")
-
-# Lexical only (best for exact identifier lookups)
-results = index.search("parse_config", mode="bm25")
-```
-
-## Result Fields
-
-Each result object exposes:
-
-```python
+# Each result exposes the matched chunk
 result = results[0]
-
-result.score              # float, relevance score
-result.chunk.file_path    # "src/config.py"
-result.chunk.start_line   # 42
-result.chunk.end_line     # 67
-result.chunk.content      # raw source code of the chunk
-```
-
-## Index Stats
-
-Inspect the state of an index with the `stats` property:
-
-```python
-stats = index.stats
-
-stats.indexed_files   # number of files indexed
-stats.total_chunks    # total number of chunks
-stats.languages       # dict mapping language name to chunk count
-                      # e.g. {"python": 412, "typescript": 88}
+result.chunk.file_path   # "model2vec/model.py"
+result.chunk.start_line  # 127
+result.chunk.end_line    # 150
+result.chunk.content     # "def save_pretrained(self, path: PathLike, ..."
 ```
