@@ -74,6 +74,16 @@ gtag('config', 'G-LQWDNXKF2X');`,
               ],
             },
             {
+              label: 'Semble',
+              items: [
+                { label: 'Introduction',   link: '/packages/semble/introduction/' },
+                { label: 'Installation',   link: '/packages/semble/installation/' },
+                { label: 'MCP Server',     link: '/packages/semble/mcp-server/' },
+                { label: 'CLI / AGENTS.md',link: '/packages/semble/usage/' },
+                { label: 'Benchmarks',     link: '/packages/semble/benchmarks/' },
+              ],
+            },
+            {
               label: 'SemHash',
               items: [
                 { label: 'Introduction',            link: '/packages/semhash/introduction/' },
@@ -92,16 +102,6 @@ gtag('config', 'G-LQWDNXKF2X');`,
                 { label: 'Installation',       link: '/packages/vicinity/installation/' },
                 { label: 'Usage',              link: '/packages/vicinity/usage/' },
                 { label: 'Supported Backends', link: '/packages/vicinity/supported-backends/' },
-              ],
-            },
-            {
-              label: 'Semble',
-              items: [
-                { label: 'Introduction',  link: '/packages/semble/introduction/' },
-                { label: 'Installation',  link: '/packages/semble/installation/' },
-                { label: 'Usage',         link: '/packages/semble/usage/' },
-                { label: 'MCP Server',    link: '/packages/semble/mcp-server/' },
-                { label: 'Benchmarks',    link: '/packages/semble/benchmarks/' },
               ],
             },
             {

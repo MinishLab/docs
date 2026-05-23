@@ -5,9 +5,9 @@ sidebar:
   icon: puzzle
 ---
 
-Semble can run as an [MCP](https://modelcontextprotocol.io/) server so agents can search any codebase directly. Repos are cloned and indexed on demand, and indexes are cached for the lifetime of the session.
+Semble can run as an [MCP](https://modelcontextprotocol.io/) server so agents can search any codebase directly. Repos are cloned and indexed on demand, and indexes are cached for the lifetime of the session. Local paths are watched for file changes and re-indexed automatically.
 
-> **Requires [uv](https://docs.astral.sh/uv/getting-started/installation/) to be installed.**
+> Requires [uv](https://docs.astral.sh/uv/getting-started/installation/) to be installed.
 
 ## Setup
 
@@ -15,21 +15,6 @@ Semble can run as an [MCP](https://modelcontextprotocol.io/) server so agents ca
 
 ```bash
 claude mcp add semble -s user -- uvx --from "semble[mcp]" semble
-```
-
-### OpenCode
-
-Add to `~/.opencode/config.json`:
-
-```json
-{
-  "mcp": {
-    "semble": {
-      "type": "local",
-      "command": ["uvx", "--from", "semble[mcp]", "semble"]
-    }
-  }
-}
 ```
 
 ### Cursor
@@ -57,13 +42,132 @@ command = "uvx"
 args = ["--from", "semble[mcp]", "semble"]
 ```
 
+### OpenCode
+
+Add to `~/.opencode/config.json`:
+
+```json
+{
+  "mcp": {
+    "semble": {
+      "type": "local",
+      "command": ["uvx", "--from", "semble[mcp]", "semble"]
+    }
+  }
+}
+```
+
+### VS Code
+
+Add to `.vscode/mcp.json` in your project (or your user profile's `mcp.json`):
+
+```json
+{
+  "servers": {
+    "semble": {
+      "command": "uvx",
+      "args": ["--from", "semble[mcp]", "semble"]
+    }
+  }
+}
+```
+
+### GitHub Copilot CLI
+
+Add to `~/.copilot/mcp-config.json`:
+
+```json
+{
+  "mcpServers": {
+    "semble": {
+      "command": "uvx",
+      "args": ["--from", "semble[mcp]", "semble"]
+    }
+  }
+}
+```
+
+### Windsurf
+
+Add to `~/.codeium/windsurf/mcp_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "semble": {
+      "command": "uvx",
+      "args": ["--from", "semble[mcp]", "semble"]
+    }
+  }
+}
+```
+
+### Gemini CLI
+
+Add to `~/.gemini/settings.json`:
+
+```json
+{
+  "mcpServers": {
+    "semble": {
+      "command": "uvx",
+      "args": ["--from", "semble[mcp]", "semble"]
+    }
+  }
+}
+```
+
+### Kiro
+
+Add to `~/.kiro/settings/mcp.json` (or `.kiro/settings/mcp.json` in your project):
+
+```json
+{
+  "mcpServers": {
+    "semble": {
+      "command": "uvx",
+      "args": ["--from", "semble[mcp]", "semble"]
+    }
+  }
+}
+```
+
+### Zed
+
+Add to `~/.config/zed/settings.json` (or `.zed/settings.json` in your project):
+
+```json
+{
+  "context_servers": {
+    "semble": {
+      "command": "uvx",
+      "args": ["--from", "semble[mcp]", "semble"]
+    }
+  }
+}
+```
+
 ## Tools
 
 Once connected, the agent has access to two tools:
 
 | Tool | Description |
 |------|-------------|
-| `search` | Search a codebase with a natural-language or code query. Pass `repo` as a git URL or local path to index it on demand. |
-| `find_related` | Given a `file_path` and `line` number from a prior search result, return chunks semantically similar to the code at that location. |
+| `search` | Search a codebase with a natural-language or code query. Pass `repo` as a local directory path or an https:// git URL. |
+| `find_related` | Given a `file_path` and `line` number, return chunks semantically similar to the code at that location. |
 
-Both tools accept a `repo` parameter (git URL or local path). The index is built on the first call and reused for subsequent calls in the same session.
+The index is built on the first call and reused for subsequent calls in the same session.
+
+## Content types
+
+By default the MCP server indexes only code files. To also index documentation (markdown, rst, etc.), config files (yaml, toml, etc.), or everything, append `--content` to the server command. Valid values are `code` (default), `docs`, `config`, and `all`, or any combination, e.g. `--content code docs`.
+
+For example, in Claude Code:
+
+```bash
+claude mcp add semble -s user -- uvx --from "semble[mcp]" semble --content all
+```
+
+## Sub-agents
+
+Sub-agents typically cannot call MCP tools directly. To give a sub-agent access to Semble, use the [CLI / AGENTS.md](/packages/semble/usage/) flow or scaffold a dedicated search sub-agent with `semble init`. See [Installation → Sub-agent](/packages/semble/installation/#3-sub-agent).
