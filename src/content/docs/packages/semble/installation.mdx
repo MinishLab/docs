@@ -1,61 +1,288 @@
 ---
 title: Installation
-description: Install Semble, set up the MCP server, and scaffold a sub-agent
+description: Install Semble, set up the MCP server, and wire it into your agent
 sidebar:
   icon: seti:config
 ---
 
-There are three things you can do to install Semble, which are independent of eachother. We recommend doing all three, but you can pick and choose based on your needs:
-
-1. [Install Semble](#1-install-semble) (for the CLI and AGENTS.md flow).
-2. [Set up the MCP server](#2-mcp-server) (so your top-level agent can call Semble as a tool).
-3. [Install the sub-agent](#3-sub-agent) (so sub-agents, which can't call MCP tools, can still search).
-
 ## Requirements
 
 - Python 3.10 or higher.
-- [uv](https://docs.astral.sh/uv/getting-started/installation/) (recommended for all three flows).
+- [uv](https://docs.astral.sh/uv/getting-started/installation/) (recommended).
 - No GPU, API keys, or external services required. Runs fully on CPU.
 
-## 1. Install Semble
+## Recommended: `semble install`
 
-Install Semble with [`uv`](https://docs.astral.sh/uv/) (recommended) or `pip`:
+The interactive installer detects your installed agents and configures any combination of three integrations:
+
+- **MCP server**: exposes Semble as a native tool your agent can call directly.
+- **Instructions**: adds CLI usage guidance to your agent's config file (`CLAUDE.md`, `AGENTS.md`, etc.).
+- **Sub-agent**: installs a dedicated `semble-search` sub-agent for harnesses that support it.
+
+Install the CLI with [uv](https://docs.astral.sh/uv/getting-started/installation/), then run:
 
 ```bash
-uv tool install semble   # Recommended
-pip install semble       # Or with pip
+uv tool install semble
+semble install
 ```
 
-This gives you the [`semble` CLI](/packages/semble/usage/).
+To undo:
 
-### Optional: wire it into AGENTS.md
+```bash
+semble uninstall
+```
 
-Once installed, drop the [AGENTS.md snippet](/packages/semble/usage/#agentsmd-snippet) into your `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, or equivalent. This teaches any agent (including sub-agents) when to reach for `semble` instead of grep, and is the only setup needed for harnesses without MCP support.
+Supported agents: Claude Code, Cursor, Gemini CLI, Kiro, OpenCode, GitHub Copilot, Codex, VS Code, Windsurf, Zed, Reasonix, and Pi.
 
-## 2. MCP Server
+> **Pi prerequisite:** Pi requires the MCP extension before Semble can connect. Run `pi install npm:pi-mcp-extension` once, then `semble install`.
 
-Install Semble as an [MCP server](/packages/semble/mcp-server/) for Claude Code:
+## Manual setup
+
+### MCP server
+
+> Requires [uv](https://docs.astral.sh/uv/getting-started/installation/) to be installed.
+
+#### Claude Code
 
 ```bash
 claude mcp add semble -s user -- uvx --from "semble[mcp]" semble
 ```
 
-For other agents (Cursor, Codex, OpenCode, VS Code, Copilot CLI, Windsurf, Gemini, Kiro, Zed), see [MCP Server](/packages/semble/mcp-server/) for the per-harness config snippet.
+#### Cursor
 
-## 3. Sub-agent
+Add to `~/.cursor/mcp.json` (or `.cursor/mcp.json` in your project):
 
-Sub-agents typically cannot call MCP tools directly. To give a sub-agent access to Semble, run `semble init` once in your project root to scaffold a dedicated search sub-agent for your harness:
-
-```bash
-semble init                      # Claude Code  → .claude/agents/semble-search.md
-semble init --agent gemini       # Gemini CLI   → .gemini/agents/semble-search.md
-semble init --agent cursor       # Cursor       → .cursor/agents/semble-search.md
-semble init --agent opencode     # OpenCode     → .opencode/agents/semble-search.md
-semble init --agent copilot      # Copilot CLI  → .github/agents/semble-search.md
-semble init --agent kiro         # Kiro         → .kiro/agents/semble-search.md
+```json
+{
+  "mcpServers": {
+    "semble": {
+      "command": "uvx",
+      "args": ["--from", "semble[mcp]", "semble"]
+    }
+  }
+}
 ```
 
-If `semble` is not on `$PATH`, prefix the command with `uvx --from "semble[mcp]"`.
+#### Codex
+
+Add to `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.semble]
+command = "uvx"
+args = ["--from", "semble[mcp]", "semble"]
+```
+
+#### OpenCode
+
+Add to `~/.config/opencode/opencode.jsonc`:
+
+```json
+{
+  "mcp": {
+    "semble": {
+      "type": "local",
+      "command": ["uvx", "--from", "semble[mcp]", "semble"]
+    }
+  }
+}
+```
+
+#### VS Code
+
+Add to `.vscode/mcp.json` in your project (or your user profile's `mcp.json`):
+
+```json
+{
+  "servers": {
+    "semble": {
+      "command": "uvx",
+      "args": ["--from", "semble[mcp]", "semble"]
+    }
+  }
+}
+```
+
+#### GitHub Copilot CLI
+
+Add to `~/.copilot/mcp-config.json`:
+
+```json
+{
+  "mcpServers": {
+    "semble": {
+      "command": "uvx",
+      "args": ["--from", "semble[mcp]", "semble"]
+    }
+  }
+}
+```
+
+#### Windsurf
+
+Add to `~/.codeium/windsurf/mcp_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "semble": {
+      "command": "uvx",
+      "args": ["--from", "semble[mcp]", "semble"]
+    }
+  }
+}
+```
+
+#### Gemini CLI
+
+Add to `~/.gemini/settings.json`:
+
+```json
+{
+  "mcpServers": {
+    "semble": {
+      "command": "uvx",
+      "args": ["--from", "semble[mcp]", "semble"]
+    }
+  }
+}
+```
+
+#### Kiro
+
+Add to `~/.kiro/settings/mcp.json` (or `.kiro/settings/mcp.json` in your project):
+
+```json
+{
+  "mcpServers": {
+    "semble": {
+      "command": "uvx",
+      "args": ["--from", "semble[mcp]", "semble"]
+    }
+  }
+}
+```
+
+#### Zed
+
+Add to `~/.config/zed/settings.json` (or `.zed/settings.json` in your project):
+
+```json
+{
+  "context_servers": {
+    "semble": {
+      "source": "custom",
+      "command": "uvx",
+      "args": ["--from", "semble[mcp]", "semble"]
+    }
+  }
+}
+```
+
+#### Reasonix
+
+Add to `~/.reasonix/config.json`:
+
+```json
+{
+  "mcpServers": {
+    "semble": {
+      "command": "uvx",
+      "args": ["--from", "semble[mcp]", "semble"]
+    }
+  }
+}
+```
+
+#### Pi
+
+First install the Pi MCP extension (one-time prerequisite):
+
+```bash
+pi install npm:pi-mcp-extension
+```
+
+Then add to `~/.pi/agent/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "semble": {
+      "command": "uvx",
+      "args": ["--from", "semble[mcp]", "semble"]
+    }
+  }
+}
+```
+
+#### Content types
+
+By default the MCP server indexes only code files. To also index documentation (markdown, rst, etc.), config files (yaml, toml, etc.), or everything, append `--content` to the server command. Valid values are `code` (default), `docs`, `config`, and `all`. For example, in Claude Code:
+
+```bash
+claude mcp add semble -s user -- uvx --from "semble[mcp]" semble --content all
+```
+
+### Instructions (AGENTS.md / CLAUDE.md)
+
+Add the snippet below to your `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, or equivalent so your agent knows when and how to call the Semble CLI:
+
+````markdown
+## Code Search
+
+Use `semble search` to find code by describing what it does or naming a symbol/identifier, instead of grep:
+
+```bash
+semble search "authentication flow" ./my-project
+semble search "save_pretrained" ./my-project
+semble search "save model to disk" ./my-project --top-k 10
+```
+
+The index is built on first run and cached automatically; it is invalidated when files change.
+
+Use `--content docs` to search documentation and prose, `--content config` for config files (yaml, toml, etc.), or `--content all` to search code, docs, and config:
+
+```bash
+semble search "deployment guide" ./my-project --content docs
+semble search "database host port" ./my-project --content config
+semble search "authentication" ./my-project --content all
+```
+
+Use `semble find-related` to discover code similar to a known location (pass `file_path` and `line` from a prior search result):
+
+```bash
+semble find-related src/auth.py 42 ./my-project
+```
+
+`path` defaults to the current directory when omitted; git URLs are accepted. If `semble` is not on `$PATH`, use `uvx --from "semble[mcp]" semble` in its place.
+
+### Workflow
+
+1. Start with `semble search` to find relevant chunks.
+2. Use `--content docs` for documentation, `--content config` for config files, or `--content all` for everything.
+3. Inspect full files only when the returned chunk does not give enough context.
+4. Optionally use `semble find-related` with a promising result's `file_path` and `line` to discover related implementations.
+5. Use grep only when you need exhaustive literal matches or quick confirmation of an exact string.
+````
+
+### Sub-agent
+
+Sub-agents typically cannot call MCP tools directly. `semble install` handles this automatically. For manual setup, copy the appropriate file from the table below to your agent's agents directory:
+
+> **Pi prerequisite:** Pi sub-agents require the Pi agents extension. Run `pi install npm:pi-agents` once before installing.
+
+| Agent | Source file | Destination |
+|---|---|---|
+| Claude Code | `claude.md` | `~/.claude/agents/semble-search.md` |
+| Cursor | `cursor.md` | `~/.cursor/agents/semble-search.md` |
+| Gemini CLI | `gemini.md` | `~/.gemini/agents/semble-search.md` |
+| Kiro | `kiro.md` | `~/.kiro/agents/semble-search.md` |
+| OpenCode | `opencode.md` | `~/.config/opencode/agents/semble-search.md` |
+| GitHub Copilot | `copilot.md` | `~/.copilot/agents/semble-search.agent.md` |
+| Reasonix | `reasonix.md` | `~/.reasonix/skills/semble-search.md` |
+| Pi | `pi.md` | `~/.pi/agents/semble-search.md` |
+
+Source files are in [`src/semble/agents/`](https://github.com/MinishLab/semble/tree/main/src/semble/agents) in the Semble repository.
 
 ## Updating Semble
 

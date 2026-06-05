@@ -5,32 +5,22 @@ sidebar:
   icon: open-book
 ---
 
-[Semble](https://github.com/MinishLab/semble) is a code search library built for agents. It returns the exact code snippets they need instantly, using ~98% fewer tokens than grep+read. Indexing and searching a full codebase end-to-end takes under a second, with ~200x faster indexing and ~10x faster queries than a code-specialized transformer, at 99% of its retrieval quality (see [benchmarks](/packages/semble/benchmarks/)). Everything runs on CPU with no API keys, GPU, or external services. Run it as an [MCP server](/packages/semble/mcp-server/) or call it from the shell via [AGENTS.md](/packages/semble/usage/) and any agent (Claude Code, Cursor, Codex, OpenCode, etc.) gets instant access to any repo.
+[Semble](https://github.com/MinishLab/semble) is a code search library built for agents. It returns the exact code snippets they need instantly, using ~98% fewer tokens than grep+read. Indexing and searching a full codebase end-to-end takes under a second, with ~200x faster indexing and ~10x faster queries than a code-specialized transformer, at 99% of its retrieval quality (see [benchmarks](/packages/semble/benchmarks/)). Everything runs on CPU with no API keys, GPU, or external services. Use it as an MCP server, a CLI tool via AGENTS.md, or a dedicated sub-agent, and any coding agent (Claude Code, Cursor, Codex, OpenCode, etc.) gets instant access to any repo.
 
 ## Quickstart
 
-Your agent queries Semble in natural language (e.g. `"How is authentication handled?"`) and gets back only the relevant code snippets, without grepping or reading full files. You can set it up as an MCP server or via AGENTS.md. First, install [uv](https://docs.astral.sh/uv/getting-started/installation/) if you don't have it yet.
+Your agent queries Semble in natural language (e.g. `"How is authentication handled?"`) and gets back only the relevant code snippets, without grepping or reading full files.
 
-
-### MCP (Claude Code)
-
-Add Semble to Claude Code (requires [uv](https://docs.astral.sh/uv/getting-started/installation/)):
+The fastest way to get started is the interactive installer. Install [uv](https://docs.astral.sh/uv/getting-started/installation/), then run:
 
 ```bash
-claude mcp add semble -s user -- uvx --from "semble[mcp]" semble
+uv tool install semble
+semble install
 ```
 
-Using another agent harness? See [MCP Server](/packages/semble/mcp-server/) for per-agent setup.
+`semble install` detects your installed coding agents (Claude Code, Cursor, Codex, Gemini, OpenCode, and more) and lets you choose which integrations to enable: MCP server, CLI instructions in AGENTS.md, and a dedicated sub-agent. To undo, run `semble uninstall`.
 
-### Bash / AGENTS.md
-
-[Install Semble](/packages/semble/installation/), then add the [AGENTS.md snippet](/packages/semble/usage/#agentsmd-snippet) to your `AGENTS.md`, `CLAUDE.md`, or equivalent. This works for any agent and is the only option for sub-agents, which typically cannot call MCP tools directly.
-
-```bash
-uv tool install semble   # Install with uv (recommended)
-pip install semble       # Or install with pip
-```
-
+For manual setup (per-agent MCP config, AGENTS.md snippet, sub-agent files), see [Installation](/packages/semble/installation/).
 
 ## Main Features
 
@@ -40,6 +30,15 @@ pip install semble       # Or install with pip
 - **Zero setup**: runs on CPU with no API keys, GPU, or external services required.
 - **MCP server**: works with Claude Code, Cursor, Codex, OpenCode, VS Code, and any other MCP-compatible agent.
 - **Local and remote**: pass a local path or a git URL.
+
+## MCP tools
+
+Once connected, the agent has access to two tools:
+
+| Tool | Description |
+|------|-------------|
+| `search` | Search a codebase with a natural-language or code query. Pass `repo` as a local path or an `https://` git URL. |
+| `find_related` | Given a `file_path` and `line` number, return chunks semantically similar to the code at that location. |
 
 ## How it works
 
