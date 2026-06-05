@@ -1,23 +1,23 @@
 ---
-title: CLI / AGENTS.md
-description: Invoke Semble from the shell or wire it into AGENTS.md for any agent
+title: CLI
+description: Invoke Semble from the shell
 sidebar:
   icon: seti:shell
 ---
 
-Semble ships as a standalone CLI. This is the best fit for sub-agents (which typically cannot call MCP tools directly), scripts, and anywhere you want search results without an MCP session. It also pairs nicely with [MCP](/packages/semble/mcp-server/) for the top-level agent.
+Semble ships as a standalone CLI. This is the best fit for sub-agents (which typically cannot call MCP tools directly), scripts, and anywhere you want search results without an MCP session.
 
 [Install Semble](/packages/semble/installation/) first:
 
 ```bash
+uv tool install semble   # with uv (recommended)
 pip install semble       # with pip
-uv tool install semble   # with uv
 ```
 
-## CLI
+## Commands
 
 ```bash
-# Search a local repo
+# Search a local repo (index is built and cached automatically)
 semble search "authentication flow" ./my-project
 
 # Search for a symbol or identifier
@@ -40,51 +40,54 @@ semble search "authentication" ./my-project --content all
 
 # Find code similar to a known location
 semble find-related src/auth.py 42 ./my-project
+
+# Clear cached indexes
+semble clear index
+
+# Clear saved token savings stats
+semble clear savings
+
+# Clear everything
+semble clear all
 ```
 
 `--content` accepts `code` (default), `docs`, `config`, or `all`. `path` defaults to the current directory when omitted; git URLs are accepted. If `semble` is not on `$PATH`, use `uvx --from "semble[mcp]" semble` in its place.
 
-## AGENTS.md snippet
+## Controlling which files are indexed
 
-Append the snippet below to your `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, or equivalent so the agent knows when to reach for Semble instead of grep:
+Semble reads `.gitignore` and `.sembleignore` files to determine which files to index. Both use standard gitignore syntax and their patterns are merged. `.sembleignore` lets you add Semble-specific rules without touching `.gitignore`.
 
-````markdown
-## Code Search
+**Excluding files:**
 
-Use `semble search` to find code by describing what it does or naming a symbol/identifier, instead of grep:
-
-```bash
-semble search "authentication flow" ./my-project
-semble search "save_pretrained" ./my-project
-semble search "save model to disk" ./my-project --top-k 10
+```
+# .sembleignore
+generated/     # exclude generated directory
+*.pb.go        # exclude Go protobuf files
 ```
 
-Use `--content docs` to search documentation and prose, `--content config` for config files (yaml, toml, etc.), or `--content all` to search code, docs, and config:
+**Including non-default extensions** — prefix the pattern with `!` to force-include files Semble wouldn't index by default:
 
-```bash
-semble search "deployment guide" ./my-project --content docs
-semble search "database host port" ./my-project --content config
-semble search "authentication" ./my-project --content all
+```
+# .sembleignore
+!*.proto       # include Protobuf files
+!*.cob         # include COBOL files
 ```
 
-Use `semble find-related` to discover code similar to a known location (pass `file_path` and `line` from a prior search result):
+Semble also always skips well-known non-source directories (`node_modules/`, `.venv/`, `dist/`, `build/`, `__pycache__/`, and similar) regardless of ignore files.
+
+## Storage
+
+Indexes and token savings statistics are stored in the OS cache folder by default:
+
+- macOS: `~/Library/Caches/semble/`
+- Linux: `~/.cache/semble/`
+- Windows: `%LOCALAPPDATA%\semble\Cache\`
+
+To override the location, set `SEMBLE_CACHE_LOCATION` to a full path:
 
 ```bash
-semble find-related src/auth.py 42 ./my-project
+export SEMBLE_CACHE_LOCATION=~/my-folder/semble
 ```
-
-`path` defaults to the current directory when omitted; git URLs are accepted. If `semble` is not on `$PATH`, use `uvx --from "semble[mcp]" semble` in its place.
-
-### Workflow
-
-1. Start with `semble search` to find relevant chunks.
-2. Use `--content docs` for documentation, `--content config` for config files, or `--content all` for everything.
-3. Inspect full files only when the returned chunk is not enough context.
-4. Optionally use `semble find-related` with a promising result's `file_path` and `line` to discover related implementations.
-5. Use grep only when you need exhaustive literal matches or quick confirmation of an exact string.
-````
-
-For agents that support dedicated sub-agents (Claude Code, Gemini, Cursor, OpenCode, Copilot CLI, Kiro), `semble init` can scaffold one for you. See [Installation → Sub-agent](/packages/semble/installation/#3-sub-agent).
 
 ## Token savings
 
@@ -105,7 +108,7 @@ semble savings --verbose # also show breakdown by call type
   All time      1.4k    [██████████████░░]  ~1.2M tokens (89%)
 ```
 
-For each call, Semble records the total character count of the unique files containing returned chunks and the character count of the snippets returned. Estimated tokens saved is `(file chars − snippet chars) / 4` (4 chars per token). This is a conservative estimate: the baseline is reading matched files in full, which is how coding agents often explore unfamiliar code. Stats are stored in `~/.semble/savings.jsonl`.
+For each call, Semble records the total character count of the unique files containing returned chunks and the character count of the snippets returned. Estimated tokens saved is `(file chars − snippet chars) / 4` (4 chars per token). This is a conservative estimate: the baseline is reading matched files in full, which is how coding agents often explore unfamiliar code.
 
 ## Library usage
 
