@@ -117,7 +117,7 @@ type PepyResponse = {
 };
 
 type HuggingFaceModelResponse = {
-  downloads?: number;
+  downloadsAllTime?: number;
 };
 
 const PEPY_API_KEY = import.meta.env.PEPY_API_KEY;
@@ -129,7 +129,7 @@ const REQUEST_HEADERS = {
 const HUGGING_FACE_AUTHOR = 'minishlab';
 
 let homepageMetricsPromise: Promise<HomepagePackageMetrics[]> | undefined;
-let huggingFaceMonthlyDownloadsPromise: Promise<number | undefined> | undefined;
+let huggingFaceDownloadsPromise: Promise<number | undefined> | undefined;
 
 async function fetchJson<T>(url: string, extraHeaders: Record<string, string> = {}) {
   const response = await fetch(url, {
@@ -172,17 +172,17 @@ async function fetchDownloads(source: DownloadSource) {
   return typeof data.total_downloads === 'number' ? data.total_downloads : undefined;
 }
 
-async function fetchHuggingFaceMonthlyDownloads() {
+async function fetchHuggingFaceDownloads() {
   const params = new URLSearchParams({
     author: HUGGING_FACE_AUTHOR,
     limit: '100',
-    full: 'true',
+    'expand[]': 'downloadsAllTime',
   });
   const models = await fetchJson<HuggingFaceModelResponse[]>(
     `https://huggingface.co/api/models?${params.toString()}`,
   );
 
-  return models.reduce((sum, model) => sum + (model.downloads ?? 0), 0);
+  return models.reduce((sum, model) => sum + (model.downloadsAllTime ?? 0), 0);
 }
 
 async function resolvePackageMetrics(pkg: HomepagePackageDefinition): Promise<HomepagePackageMetrics> {
@@ -204,22 +204,22 @@ export async function getHomepagePackageMetrics() {
 }
 
 export async function getHomepageTotals() {
-  const [packages, monthlyModelDownloads] = await Promise.all([
+  const [packages, modelDownloads] = await Promise.all([
     getHomepagePackageMetrics(),
-    (huggingFaceMonthlyDownloadsPromise ??=
-      fetchHuggingFaceMonthlyDownloads().catch(() => undefined)),
+    (huggingFaceDownloadsPromise ??=
+      fetchHuggingFaceDownloads().catch(() => undefined)),
   ]);
 
   return packages.reduce(
     (totals, pkg) => ({
       stars: totals.stars + pkg.stars,
       downloads: totals.downloads + pkg.downloads,
-      monthlyModelDownloads: totals.monthlyModelDownloads,
+      modelDownloads: totals.modelDownloads,
     }),
     {
       stars: 0,
       downloads: 0,
-      monthlyModelDownloads,
+      modelDownloads,
     },
   );
 }

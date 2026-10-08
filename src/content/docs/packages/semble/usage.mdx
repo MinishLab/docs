@@ -5,7 +5,7 @@ sidebar:
   icon: seti:shell
 ---
 
-Semble ships as a standalone CLI. This is the best fit for sub-agents (which typically cannot call MCP tools directly), scripts, and anywhere you want search results without an MCP session.
+Semble ships as a standalone CLI. This is the best fit for sub-agents (which typically cannot call MCP tools directly), scripts, and anywhere you want search results without an MCP session. Indexes are built and cached on first run, and invalidated automatically when files change.
 
 [Install Semble](/packages/semble/installation/) first:
 
@@ -26,8 +26,14 @@ semble search "save_pretrained" ./my-project
 # Search a remote repo (cloned on demand)
 semble search "save model to disk" https://github.com/MinishLab/model2vec
 
+# Search several repos at once (results are prefixed with the repo name)
+semble search "invoice endpoint" ./service-a ./service-b
+
 # Limit results
 semble search "save model to disk" ./my-project --top-k 10
+
+# Show only the first N lines of each result's snippet (0 = path/line range only)
+semble search "authentication flow" ./my-project --max-snippet-lines 10
 
 # Search docs and prose (markdown, rst, etc.) instead of code
 semble search "deployment guide" ./my-project --content docs
@@ -41,21 +47,19 @@ semble search "authentication" ./my-project --content all
 # Find code similar to a known location
 semble find-related src/auth.py 42 ./my-project
 
-# Clear cached indexes
-semble clear index
-
-# Clear saved token savings stats
-semble clear savings
-
-# Clear everything
-semble clear all
+# Print the installed version
+semble --version
 ```
 
-`--content` accepts `code` (default), `docs`, `config`, or `all`. `path` defaults to the current directory when omitted; git URLs are accepted. If `semble` is not on `$PATH`, use `uvx --from "semble[mcp]" semble` in its place.
+`--content` accepts `code` (default), `docs`, `config`, or `all`, and can take several values (e.g. `--content code docs`). `--format` accepts `json` (default) or `text`. `path` defaults to the current directory when omitted; git URLs are accepted. If `semble` is not on `$PATH`, use `uvx --from "semble[mcp]" semble` in its place.
+
+## Searching multiple repos
+
+Passing several paths or URLs searches them as one corpus, so a query from repo A can find an endpoint defined in repo B. Each index is cached per repo and merged at query time. Result paths are prefixed with the repo name (`service-b/api/invoices.py`) and the output includes a `repos` map from prefix to absolute path or URL. Pass the prefixed path to `find-related` to search across all repos from a known location.
 
 ## Controlling which files are indexed
 
-Semble reads `.gitignore` and `.sembleignore` files to determine which files to index. Both use standard gitignore syntax and their patterns are merged. `.sembleignore` lets you add Semble-specific rules without touching `.gitignore`.
+Semble reads `.gitignore` and `.sembleignore` files to determine which files to index. Both use standard gitignore syntax and their patterns are merged. `.sembleignore` lets you add Semble-specific rules without touching `.gitignore`. Rules are applied recursively, so a `.sembleignore` in a subdirectory applies to that subtree.
 
 **Excluding files:**
 
@@ -65,7 +69,7 @@ generated/     # exclude generated directory
 *.pb.go        # exclude Go protobuf files
 ```
 
-**Including non-default extensions** — prefix the pattern with `!` to force-include files Semble wouldn't index by default:
+**Including non-default extensions:** prefix the pattern with `!` to force-include files Semble wouldn't index by default:
 
 ```
 # .sembleignore
@@ -74,6 +78,8 @@ generated/     # exclude generated directory
 ```
 
 Semble also always skips well-known non-source directories (`node_modules/`, `.venv/`, `dist/`, `build/`, `__pycache__/`, and similar) regardless of ignore files.
+
+Files larger than 1 MB are skipped during indexing to keep index builds lean, and are reported as a warning at index time. To raise (or lower) this limit, set `SEMBLE_MAX_FILE_BYTES` to a size in bytes.
 
 ## Storage
 
@@ -89,23 +95,48 @@ To override the location, set `SEMBLE_CACHE_LOCATION` to a full path:
 export SEMBLE_CACHE_LOCATION=~/my-folder/semble
 ```
 
+On first use, Semble also downloads the embedding model from Hugging Face and caches it in the standard Hugging Face cache (`~/.cache/huggingface/` by default, or `$HF_HOME` if set). This only happens once and requires network access.
+
+Use `semble clear` to remove cached data:
+
+```bash
+semble clear index     # saved indexes
+semble clear savings   # usage stats
+semble clear orphans   # indexes for repos no longer present on disk
+semble clear all       # everything
+```
+
 ## Token savings
 
 `semble savings` shows how many tokens Semble has saved across all your searches:
 
 ```bash
-semble savings           # summary by period
-semble savings --verbose # also show breakdown by call type
+semble savings
 ```
 
 ```
   Semble Token Savings
-  ════════════════════════════════════════════════════════════════
-  Period        Calls   Savings
-  ────────────────────────────────────────────────────────────────
-  Today         42      [███████████████░]  ~58.4k tokens (95%)
-  Last 7 days   287     [██████████████░░]  ~312.4k tokens (90%)
-  All time      1.4k    [██████████████░░]  ~1.2M tokens (89%)
+  ════════════════════════════════════════════════════════════════════════
+
+  Total saved:  ~714.2M tokens  (94%)
+  Total calls:  14.3k
+  Efficiency:  ███████████████████████░  94%
+
+  By Period
+  ────────────────────────────────────────────────────────────────────────
+  Period             Calls           Saved  Ratio
+  ────────────────────────────────────────────────────────────────────────
+  Today                198    ~1.4M tokens  ███████████████████████░  95%
+  Last 7 days        13.1k  ~707.2M tokens  ███████████████████████░  94%
+  All time           14.3k  ~714.2M tokens  ███████████████████████░  94%
+
+  By Call Type
+  ────────────────────────────────────────────────────────────────────────
+  #     Call type            Calls  Share
+  ────────────────────────────────────────────────────────────────────────
+  1.    search               14.1k  ████████████████    99%
+  2.    find_related           205  █░░░░░░░░░░░░░░░     1%
+  ════════════════════════════════════════════════════════════════════════
 ```
 
 For each call, Semble records the total character count of the unique files containing returned chunks and the character count of the snippets returned. Estimated tokens saved is `(file chars − snippet chars) / 4` (4 chars per token). This is a conservative estimate: the baseline is reading matched files in full, which is how coding agents often explore unfamiliar code.
@@ -131,6 +162,12 @@ index = SembleIndex.from_path(
 
 # Index a remote git repository
 index = SembleIndex.from_git("https://github.com/MinishLab/model2vec")
+
+# Merge indexes from several repos into one (chunk paths are prefixed with the repo name)
+index = SembleIndex.merge([
+    ("./service-a", SembleIndex.from_path("./service-a")),
+    ("./service-b", SembleIndex.from_path("./service-b")),
+])
 
 # Search the index with a natural-language or code query
 results = index.search("save model to disk", top_k=3)

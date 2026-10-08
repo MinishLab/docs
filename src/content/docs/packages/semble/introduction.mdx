@@ -5,7 +5,7 @@ sidebar:
   icon: open-book
 ---
 
-[Semble](https://github.com/MinishLab/semble) is a code search library built for agents. It returns the exact code snippets they need instantly, using ~98% fewer tokens than grep+read. Indexing and searching a full codebase end-to-end takes under a second, with ~200x faster indexing and ~10x faster queries than a code-specialized transformer, at 99% of its retrieval quality (see [benchmarks](/packages/semble/benchmarks/)). Everything runs on CPU with no API keys, GPU, or external services. Use it as an MCP server, a CLI tool via AGENTS.md, or a dedicated sub-agent, and any coding agent (Claude Code, Cursor, Codex, OpenCode, etc.) gets instant access to any repo.
+[Semble](https://github.com/MinishLab/semble) is a code search library built for agents. It returns the exact code snippets they need instantly, using ~99% fewer tokens than grep+read. Indexing and searching a full codebase end-to-end takes under a second for most repos, matching the retrieval quality of a code-specialized transformer while indexing ~380x faster and querying ~17x faster (see [benchmarks](/packages/semble/benchmarks/)). Everything runs on CPU with no API keys, GPU, or external services. Use it as an MCP server, a CLI tool via AGENTS.md, or a dedicated sub-agent, and any coding agent (Claude Code, Cursor, Codex, OpenCode, etc.) gets instant access to any repo.
 
 ## Quickstart
 
@@ -18,18 +18,18 @@ uv tool install semble
 semble install
 ```
 
-`semble install` detects your installed coding agents (Claude Code, Cursor, Codex, Gemini, OpenCode, and more) and lets you choose which integrations to enable: MCP server, CLI instructions in AGENTS.md, and a dedicated sub-agent. To undo, run `semble uninstall`.
+`semble install` detects your installed coding agents (Claude Code, Cursor, Codex, Gemini CLI, OpenCode, and [more](/packages/semble/installation/)) and lets you choose which integrations to enable: MCP server, CLI instructions in AGENTS.md, and a dedicated sub-agent. To undo, run `semble uninstall`. For sandboxed or scripted environments, see [unattended install](/packages/semble/installation/#unattended-install).
 
 For manual setup (per-agent MCP config, AGENTS.md snippet, sub-agent files), see [Installation](/packages/semble/installation/).
 
 ## Main Features
 
-- **Fast**: indexes an average repo in ~250 ms and answers queries in ~1.5 ms, all on CPU.
+- **Fast**: indexes an average repo in ~500 ms and answers queries in ~1 ms, all on CPU.
 - **Accurate**: NDCG@10 of 0.854 on the [benchmarks](/packages/semble/benchmarks/), on par with code-specialized transformer models at a fraction of the size and cost.
-- **Token-efficient**: returns only the relevant chunks, using [~98% fewer tokens than grep+read](/packages/semble/benchmarks/#token-efficiency).
+- **Token-efficient**: returns only the relevant chunks, using [~99% fewer tokens than grep+read](/packages/semble/benchmarks/#token-efficiency).
 - **Zero setup**: runs on CPU with no API keys, GPU, or external services required.
 - **MCP server**: works with Claude Code, Cursor, Codex, OpenCode, VS Code, and any other MCP-compatible agent.
-- **Local and remote**: pass a local path or a git URL.
+- **Local and remote**: pass a local path or a git URL, or several of them to search related repos together.
 
 ## MCP tools
 
@@ -37,12 +37,12 @@ Once connected, the agent has access to two tools:
 
 | Tool | Description |
 |------|-------------|
-| `search` | Search a codebase with a natural-language or code query. Pass `repo` as a local path or an `https://` git URL. |
+| `search` | Search a codebase with a natural-language or code query. Pass `repo` as a local path or an `https://` git URL (or a list of them to search several repos together) and `content` as `code`, `docs`, `config`, or `all` (default: `code`). |
 | `find_related` | Given a `file_path` and `line` number, return chunks semantically similar to the code at that location. |
 
 ## How it works
 
-Semble splits each file into code-aware chunks using [tree-sitter](https://github.com/tree-sitter/py-tree-sitter), then scores every query against the chunks with two complementary retrievers: static [Model2Vec](https://github.com/MinishLab/model2vec) embeddings using the code-specialized [potion-code-16M](https://huggingface.co/minishlab/potion-code-16M) model for semantic similarity, and [BM25](https://github.com/xhluca/bm25s) for lexical matches on identifiers and API names. The two score lists are fused with Reciprocal Rank Fusion (RRF).
+Semble splits each file into code-aware chunks using [tree-sitter](https://github.com/tree-sitter/py-tree-sitter), then scores every query against the chunks with two complementary retrievers: static [Model2Vec](https://github.com/MinishLab/model2vec) embeddings using the code-specialized [potion-code-16M-v2](https://huggingface.co/minishlab/potion-code-16M-v2) model for semantic similarity, and BM25 for lexical matches on identifiers and API names. The two score lists are fused with Reciprocal Rank Fusion (RRF).
 
 After fusing, results are reranked with a set of code-aware signals:
 
@@ -53,6 +53,12 @@ After fusing, results are reranked with a set of code-aware signals:
 - **Noise penalties.** Test files, `compat/`/`legacy/` shims, example code, and `.d.ts` declaration stubs are down-ranked so canonical implementations surface first.
 
 Because the embedding model is static with no transformer forward pass at query time, all of this runs in milliseconds on CPU.
+
+Indexes are cached to disk automatically on the first search. On subsequent runs, Semble walks the file tree and compares modification times; added, removed, or changed files are reindexed incrementally, without rebuilding the rest of the index. A full rebuild only happens if the indexing settings change (e.g., after an upgrade that changes the model, chunking, or cache format). In MCP mode, the index is refreshed automatically as files change, so results stay current across the session.
+
+### Using a custom model
+
+To use another model, set the `SEMBLE_MODEL_NAME` environment variable to a local path or Hugging Face repository containing a [Model2Vec](https://github.com/MinishLab/model2vec)-compatible model. This is particularly useful if you can't access Hugging Face at runtime.
 
 ## Citing
 
