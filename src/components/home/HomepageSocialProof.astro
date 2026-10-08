@@ -29,15 +29,15 @@ const totals = await getHomepageTotals();
       <span class="hero-proof-label">Package downloads</span>
     </span>
   </span>
-  {typeof totals.monthlyModelDownloads === 'number' && totals.monthlyModelDownloads > 0 && (
+  {typeof totals.modelDownloads === 'number' && totals.modelDownloads > 0 && (
     <span
       class="hero-proof-chip hero-proof-chip-hf"
-      title={`${formatExactNumber(totals.monthlyModelDownloads)} model downloads in the last 30 days on Hugging Face`}
+      title={`${formatExactNumber(totals.modelDownloads)} all-time model downloads on Hugging Face`}
     >
       <span class="hero-proof-icon hero-proof-icon-downloads" aria-hidden="true"></span>
       <span class="hero-proof-copy">
-        <span class="hero-proof-value">{formatCompactNumber(totals.monthlyModelDownloads)}+</span>
-        <span class="hero-proof-label">Monthly model downloads</span>
+        <span class="hero-proof-value">{formatCompactNumber(totals.modelDownloads)}+</span>
+        <span class="hero-proof-label">Model downloads</span>
       </span>
     </span>
   )}

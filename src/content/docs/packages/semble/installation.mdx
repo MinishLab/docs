@@ -13,7 +13,7 @@ sidebar:
 
 ## Recommended: `semble install`
 
-The interactive installer detects your installed agents and configures any combination of three integrations:
+The interactive installer detects your installed agents and configures any combination of three integrations globally:
 
 - **MCP server**: exposes Semble as a native tool your agent can call directly.
 - **Instructions**: adds CLI usage guidance to your agent's config file (`CLAUDE.md`, `AGENTS.md`, etc.).
@@ -32,9 +32,27 @@ To undo:
 semble uninstall
 ```
 
-Supported agents: Claude Code, Cursor, Gemini CLI, Kiro, OpenCode, GitHub Copilot, Codex, VS Code, Windsurf, Zed, Reasonix, and Pi.
+Supported agents: Claude Code, Cursor, Gemini CLI, Kiro, OpenCode, GitHub Copilot, Codex, VS Code, Windsurf, Zed, Reasonix, Pi, Command Code, Antigravity, ZCode, Grok Build, Qwen Code, Cline, and Kilo Code.
 
 > **Pi prerequisite:** Pi requires the MCP extension before Semble can connect. Run `pi install npm:pi-mcp-extension` once, then `semble install`.
+
+### Unattended install
+
+For sandboxed or scripted environments, pass `--agent` to skip the interactive prompts:
+
+```bash
+semble install --agent claude pi --type mcp subagent --yes
+```
+
+- `--agent`: one or more agent ids (the lowercase form of the names above, e.g. `claude`, `codex`, `pi`).
+- `--type`: one or more of `mcp`, `instructions`, `subagent`, or `all` (default: all). Requires `--agent`.
+- `-y`/`--yes`: skip the confirmation prompt. Requires `--agent` for a fully non-interactive run.
+
+`semble uninstall` accepts the same flags.
+
+### Keeping installed configuration up to date
+
+The MCP server config, `AGENTS.md`/`CLAUDE.md` instructions, and sub-agent files that `semble install` writes all pin `uvx` to the exact Semble version you have installed (`semble[mcp]==X.Y.Z`), so agents keep calling the version the instructions were written for rather than whatever is newest on PyPI. After upgrading, rerun `semble install`. It is idempotent and rewrites the pin (and anything else that changed) in place for every agent you select.
 
 ## Manual setup
 
@@ -181,7 +199,7 @@ Add to `~/.config/zed/settings.json` (or `.zed/settings.json` in your project):
 
 #### Reasonix
 
-Add to `~/.reasonix/config.json`:
+Add to `~/.reasonix/config.json` (the backwards-compatible MCP config path read by all Reasonix versions):
 
 ```json
 {
@@ -215,17 +233,137 @@ Then add to `~/.pi/agent/mcp.json`:
 }
 ```
 
-#### Content types
+#### Antigravity
 
-By default the MCP server indexes only code files. To also index documentation (markdown, rst, etc.), config files (yaml, toml, etc.), or everything, append `--content` to the server command. Valid values are `code` (default), `docs`, `config`, and `all`. For example, in Claude Code:
+Add to `~/.gemini/config/mcp_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "semble": {
+      "command": "uvx",
+      "args": ["--from", "semble[mcp]", "semble"]
+    }
+  }
+}
+```
+
+#### Command Code
+
+Add to `~/.commandcode/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "semble": {
+      "command": "uvx",
+      "args": ["--from", "semble[mcp]", "semble"]
+    }
+  }
+}
+```
+
+Or use the CLI:
+
+```bash
+cmd mcp add --scope user semble -- uvx --from "semble[mcp]" semble
+```
+
+#### ZCode
+
+Add to `~/.zcode/cli/config.json` under the nested `mcp.servers` key (or use Settings → MCP Servers → Full configuration mode):
+
+```json
+{
+  "mcp": {
+    "servers": {
+      "semble": {
+        "command": "uvx",
+        "args": ["--from", "semble[mcp]", "semble"],
+        "type": "stdio"
+      }
+    }
+  }
+}
+```
+
+#### Grok Build
+
+Add to `~/.grok/config.toml`:
+
+```toml
+[mcp_servers.semble]
+command = "uvx"
+args = ["--from", "semble[mcp]", "semble"]
+```
+
+#### Qwen Code
+
+Add to `~/.qwen/settings.json`:
+
+```json
+{
+  "mcpServers": {
+    "semble": {
+      "command": "uvx",
+      "args": ["--from", "semble[mcp]", "semble"]
+    }
+  }
+}
+```
+
+#### Cline
+
+Add to `~/.cline/data/settings/cline_mcp_settings.json` (shared by the Cline IDE extensions and CLI):
+
+```json
+{
+  "mcpServers": {
+    "semble": {
+      "transport": {
+        "type": "stdio",
+        "command": "uvx",
+        "args": ["--from", "semble[mcp]", "semble"]
+      }
+    }
+  }
+}
+```
+
+Or use the CLI:
+
+```bash
+cline mcp add semble --yes -- uvx --from "semble[mcp]" semble
+```
+
+#### Kilo Code
+
+Add to `~/.config/kilo/kilo.jsonc`:
+
+```json
+{
+  "mcp": {
+    "semble": {
+      "type": "local",
+      "command": ["uvx", "--from", "semble[mcp]", "semble"]
+    }
+  }
+}
+```
+
+#### Content types and memory
+
+The MCP server indexes each requested content selection on first use and caches it separately. Searches default to code; append `--content docs`, `--content config`, or `--content all` to the server command to change that default. The `content` argument on an individual MCP search overrides it. For example, in Claude Code:
 
 ```bash
 claude mcp add semble -s user -- uvx --from "semble[mcp]" semble --content all
 ```
 
+Indexes stay in memory for the lifetime of the server. To free memory while idle, set `SEMBLE_MCP_IDLE_TIMEOUT` to a number of seconds; indexes unused for that long are dropped from memory and reloaded from the disk cache on the next search.
+
 ### Instructions (AGENTS.md / CLAUDE.md)
 
-Add the snippet below to your `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, or equivalent so your agent knows when and how to call the Semble CLI:
+Add the snippet below to your `AGENTS.md`, `CLAUDE.md`, or equivalent so your agent knows when and how to call the Semble CLI:
 
 ````markdown
 ## Code Search
@@ -233,12 +371,12 @@ Add the snippet below to your `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, or equivale
 Use `semble search` to find code by describing what it does or naming a symbol/identifier, instead of grep:
 
 ```bash
-semble search "authentication flow" ./my-project
-semble search "save_pretrained" ./my-project
-semble search "save model to disk" ./my-project --top-k 10
+semble search "authentication flow" ./my-project --max-snippet-lines 10  # first 10 lines only, concise
+semble search "save_pretrained" ./my-project                          # full chunk content
+semble search "save model to disk" ./my-project --top-k 10           # more results
 ```
 
-The index is built on first run and cached automatically; it is invalidated when files change.
+The index is built on first run (and cached for subsequent runs) and invalidated automatically when files change.
 
 Use `--content docs` to search documentation and prose, `--content config` for config files (yaml, toml, etc.), or `--content all` to search code, docs, and config:
 
@@ -254,20 +392,27 @@ Use `semble find-related` to discover code similar to a known location (pass `fi
 semble find-related src/auth.py 42 ./my-project
 ```
 
-`path` defaults to the current directory when omitted; git URLs are accepted. If `semble` is not on `$PATH`, use `uvx --from "semble[mcp]" semble` in its place.
+`path` defaults to the current directory when omitted; git URLs are accepted. Pass several paths or URLs to search related repos together, e.g. when this project calls a service defined in a sibling repo. Result paths are then prefixed with the repo name and the output includes a `repos` map from prefix to location:
+
+```bash
+semble search "invoice endpoint" ./service-a ../service-b
+```
+
+If `semble` is not on `$PATH`, use `uvx --from "semble[mcp]" semble` in its place.
 
 ### Workflow
 
-1. Start with `semble search` to find relevant chunks.
+1. Start with `semble search` to find relevant chunks. The index is built and cached automatically.
 2. Use `--content docs` for documentation, `--content config` for config files, or `--content all` for everything.
-3. Inspect full files only when the returned chunk does not give enough context.
+3. Navigate directly to the returned file and line. Do not re-search or grep for the same content.
 4. Optionally use `semble find-related` with a promising result's `file_path` and `line` to discover related implementations.
-5. Use grep only when you need exhaustive literal matches or quick confirmation of an exact string.
+5. If the answer may live in a dependent or sibling repo, pass all relevant repo paths to one `semble search` call.
+6. Use grep only when you need every occurrence of a literal string across the whole repo (e.g., all callers of a renamed function).
 ````
 
 ### Sub-agent
 
-Sub-agents typically cannot call MCP tools directly. `semble install` handles this automatically. For manual setup, copy the appropriate file from the table below to your agent's agents directory:
+Sub-agents typically cannot call MCP tools directly, so for harnesses that support them you can install a dedicated `semble-search` sub-agent that uses the CLI. `semble install` handles this automatically. For manual setup, copy the appropriate file from the table below to your agent's agents directory:
 
 > **Pi prerequisite:** Pi sub-agents require the Pi agents extension. Run `pi install npm:pi-agents` once before installing.
 
@@ -279,8 +424,15 @@ Sub-agents typically cannot call MCP tools directly. `semble install` handles th
 | Kiro | `kiro.md` | `~/.kiro/agents/semble-search.md` |
 | OpenCode | `opencode.md` | `~/.config/opencode/agents/semble-search.md` |
 | GitHub Copilot | `copilot.md` | `~/.copilot/agents/semble-search.agent.md` |
+| Codex | `codex.toml` | `~/.codex/agents/semble-search.toml` |
 | Reasonix | `reasonix.md` | `~/.reasonix/skills/semble-search.md` |
 | Pi | `pi.md` | `~/.pi/agents/semble-search.md` |
+| Command Code | `commandcode.md` | `~/.commandcode/agents/semble-search.md` |
+| Antigravity | `antigravity.md` | `~/.gemini/config/skills/semble-search/SKILL.md` |
+| ZCode | `zcode.md` | `~/.zcode/agents/semble-search.md` |
+| Grok Build | `grok.md` | `~/.grok/agents/semble-search.md` |
+| Qwen Code | `qwen.md` | `~/.qwen/agents/semble-search.md` |
+| Kilo Code | `kilo.md` | `~/.config/kilo/agents/semble-search.md` |
 
 Source files are in [`src/semble/agents/`](https://github.com/MinishLab/semble/tree/main/src/semble/agents) in the Semble repository.
 
@@ -291,3 +443,5 @@ uv tool upgrade semble         # with uv
 pip install --upgrade semble   # with pip
 uv cache clean semble          # for MCP users (restart your MCP client after)
 ```
+
+If you used `semble install`, rerun it after upgrading so the version pin in your agent configs is updated (see [above](#keeping-installed-configuration-up-to-date)).
