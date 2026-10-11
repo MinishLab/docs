@@ -1,0 +1,75 @@
+---
+title: "Model2Vec v0.10.0"
+date: 2025-10-11
+authors:
+  - minish
+excerpt: "The Model2Vec v0.10.0 release notes"
+---
+
+Most of this release is about training. It adds a pair-similarity trainer, lets `fit` take Hugging Face `datasets` columns directly, and adds focal loss, token dropout and faster training. It also adds a public ONNX export API that can export classifier and regressor pipelines, and fixes a number of tokenization and padding bugs.
+
+## ⚠️ Breaking changes
+
+- `StaticModel.tokenize` no longer takes `max_length`. Truncation now follows the model's `max_length` property, which has a new setter (#356, #363).
+- `encode_as_sequence` ignores the model's `max_length`. It only truncates if you pass `max_length` to the call yourself (#363).
+- The ONNX export script has been replaced by a function. `scripts/export_to_onnx.py` is gone, so use `model2vec.onnx.export_model_to_onnx(model, save_path, ...)` instead (#347).
+- Trainable models no longer use a pad token. The `pad_token` argument of `from_pretrained` and `from_static_model` and the `pad_id` constructor argument have been removed (#390).
+- Token weights in trainable models are no longer passed through a sigmoid. They're trained directly and start at 1 (#371). Training code that reads `model.w` directly will see different values.
+- `freeze_weights` now defaults to `None`. With `None`, a model that has token weights trains them, and a model without token weights takes the unweighted mean of its token embeddings. Previously, a model without weights always learned new ones. To keep that behavior, pass `freeze_weights=False` (#390).
+- Dependency changes:
+  - `huggingface-hub>=1.0.0` is now a core dependency (#345).
+  - The `distill` extra no longer needs `scikit-learn`, because PCA is now implemented in NumPy (#344). It now requires `skeletoken>=0.6.0,<0.7.0`.
+  - The `train` extra now requires `datasets>=4.0.0` (#387).
+  - The `onnx` extra now includes `onnxruntime`, `onnxscript` and `skeletoken` (#347).
+
+## ✨ New features
+
+### Training
+
+- **Pair similarity:** `StaticModelForPairSimilarity` is a new trainer that embeds related pairs of texts close together, such as queries and their documents (#372). It's trained with an InfoNCE loss over in-batch negatives, and its `temperature` argument defaults to `0.05` (#381). With `n_layers=0`, pair and similarity models have no head, so `to_static_model` returns exactly the trained embeddings (#383).
+- **Hugging Face datasets:** `fit` accepts dataset columns such as `dataset["text"]` directly. Data is read and tokenized per batch, so the dataset isn't loaded into memory. Without an explicit validation set, the held-out split is capped at 10,000 rows, and single-label classification splits are stratified (#387).
+- **Focal loss:** `StaticModelForClassification.fit(..., focal_gamma=...)` down-weights texts the model already classifies confidently. It supports single-label and multi-label classification and can be combined with `class_weight`. The default, `0.0`, is plain (binary) cross-entropy (#391).
+- **Token dropout:** `fit(..., token_dropout=...)` randomly drops a fraction of the tokens of each training text. A non-empty text always keeps at least one token. It's available for all trainers, and for pair similarity it applies to both texts of a pair (#373, #393).
+- **Faster training:** training was reworked (#387, #390). The classification example in the training README now trains in 31 seconds instead of 81, and reaches 92% accuracy instead of 91%.
+- **Explicit arguments:** `from_pretrained` and `from_static_model` on every trainable class now list and document their arguments (`max_length`, `n_layers`, `hidden_dim`, `out_dim`, `freeze`, `normalize`, `freeze_weights`). You no longer have to pass them blindly through `**kwargs` (#388, #389).
+- **More metrics in the progress bar:** classifiers now show extra metrics, such as accuracy, in the training progress bar (#384).
+
+### ONNX
+
+- Classifier and regressor pipelines can be exported to ONNX with their heads included (#346).
+- Exports now include a model card, and `source_model_name` records which model was exported (#349).
+
+### Inference and loading
+
+- **Faster encoding:** parallel encoding now uses threads, and int8 models are cast to float32 before encoding (#367).
+- `StaticModel` has a `max_length` property with a setter. ONNX export respects it too (#356).
+- Hub downloads only fetch model2vec files and the README, so the rest of a repository is skipped (#370, #392).
+- Download progress bars are now silenced (#345).
+
+## 🐛 Bug fixes
+
+- Padding and tokenization:
+  - Padding is turned off during distillation, inference and training, so texts are no longer padded to the longest text in a chunk (#376, #379).
+  - Unknown tokens are dropped during training and inference, matching how `StaticModel` tokenizes (#359).
+  - The unk token is fixed for Unigram tokenizers (#354), and added tokens get correct start-of-word handling (#351).
+- Training:
+  - Texts without any tokens no longer cause NaN gradients (#380).
+  - The trainer now restores the best checkpoint, not the last one (#352).
+  - The trainer's `max_length` no longer depends on the static model's tokenizer truncation (#374).
+  - `random_seed` now also controls the train/validation split. Before, the split always used the default seed (#396).
+- Loading:
+  - `subfolder` is now respected when downloading from the Hub, and a cached model is only reused if it actually contains a valid model (#392).
+  - The `token` argument is now passed through when a pipeline loads its encoder (#362).
+- ONNX:
+  - Export correctly ignores the unk token (#353).
+  - Vocabulary-quantized models are exported with their token mapping and weights (#364).
+- Other:
+  - Distillation now guards against duplicate tokens, and added tokens are normalized (#350).
+  - Fixed a float16 norm underflow (#369).
+
+## 📚 Docs and maintenance
+
+- The training docs were rewritten to cover every trainer, focal loss and token dropout. The training benchmark was also rerun on 26 datasets, with fastText and a fully fine-tuned MiniLM as new baselines (#397).
+- The tutorial notebooks were removed (#394).
+- Added contribution guidelines (#386), updated the main README (#361), fixed the classifier docstring (#366), and added a Greptile acknowledgement (#377).
+- Added a new integration test (#355). Loader return types now use `T` (#357), and some encoding code was refactored to remove duplication (#365).
