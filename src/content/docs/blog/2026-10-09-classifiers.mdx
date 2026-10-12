@@ -72,6 +72,8 @@ Because the score and binary models share the same architecture, we time each me
 | fastText (pretrained) | 6.30 ± 0.08 | 7,415 |
 | Luxical-one + MLP | 10.06 ± 0.07 | 4,648 |
 
+![Binary F1 vs. inference speed, with marker size showing parameter count](/images/blog/post_classifiers/speed_vs_f1.png)
+
 ## Discussion
 
 On both evaluations, the pretrained classifier outperforms all other methods, showing that strong pretrained transformers, even when frozen, outperform static models, even static models with up to three times as many parameters. Static methods, however, are between 300 and 800 times faster. 
