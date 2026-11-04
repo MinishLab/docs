@@ -1,0 +1,36 @@
+<script>
+  // Each bar fills in a time proportional to the square root of its real time (the slowest takes
+  // FILL_MS), so slower tasks visibly take longer without crawling. Clocks count up to the real
+  // times from the markup; the card then holds for HOLD_MS and replays. Sources live in the tooltip.
+  const FILL_MS = 4000;
+  const HOLD_MS = 4000;
+
+  const clock = (s: number) =>
+    s < 60 ? `${Math.floor(s)}s` : `${Math.floor(s / 60)}m ${String(Math.floor(s % 60)).padStart(2, '0')}s`;
+
+  const card = document.querySelector<HTMLElement>('.race');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (card && !reducedMotion) {
+    const rows = [...card.querySelectorAll<HTMLElement>('.race-row')].map((row) => ({
+      seconds: Number(row.dataset.seconds),
+      fill: row.querySelector<HTMLElement>('.race-fill')!,
+      time: row.querySelector<HTMLElement>('[data-time]')!,
+    }));
+    const slowest = Math.max(...rows.map((r) => r.seconds));
+    const fillMs = (seconds: number) => FILL_MS * Math.sqrt(seconds / slowest);
+    let start = performance.now();
+
+    const render = (now: number) => {
+      for (const { seconds, fill, time } of rows) {
+        const progress = Math.min((now - start) / fillMs(seconds), 1);
+        fill.style.width = `${progress * 100}%`;
+        time.textContent = clock(progress * seconds);
+        time.classList.toggle('done', progress >= 1);
+      }
+      if (now - start > FILL_MS + HOLD_MS) start = now;
+      requestAnimationFrame(render);
+    };
+    requestAnimationFrame(render);
+  }
+</script>
