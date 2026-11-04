@@ -1548,9 +1548,12 @@ header.header {
   border-color: var(--retro-line) !important;
 }
 
-/* No overscroll bounce, so the cream page never peeks above the green header */
-html {
-  overscroll-behavior-y: none;
+/* No overscroll bounce, so the cream page never peeks above the green header.
+   Mouse and trackpad only: on touch screens it would also block pull-to-refresh. */
+@media (pointer: fine) {
+  html {
+    overscroll-behavior-y: none;
+  }
 }
 
 /* Header: green band on every page */
