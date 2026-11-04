@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Mono:wght@700&display=swap');
 @import 'katex/dist/katex.min.css';
 
 /* ─── FONTS ─── */
@@ -74,7 +75,7 @@
   font-weight: 700 !important;
   letter-spacing: -0.03em !important;
   line-height: 1.05 !important;
-  color: var(--sl-color-accent) !important;
+  color: var(--retro-ink) !important;
 }
 
 /* ─── HERO: tighten spacing between title and tagline/actions ─── */
@@ -525,7 +526,7 @@ main:has(.pkg-list) .hero {
 
 .pkg-row-main {
   display: grid;
-  grid-template-columns: 66px minmax(0, 1fr);
+  grid-template-columns: 84px minmax(0, 1fr);
   column-gap: 1.85rem;
   row-gap: 0.85rem;
   align-items: center;
@@ -557,8 +558,8 @@ main:has(.pkg-list) .hero {
 }
 
 .pkg-icon-wrap {
-  width: 66px;
-  height: 66px;
+  width: 84px;
+  height: 84px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -566,21 +567,12 @@ main:has(.pkg-list) .hero {
 }
 
 .pkg-icon {
-  width: 66px;
-  height: 66px;
+  width: 84px;
+  height: 84px;
   object-fit: contain;
   object-position: center;
   display: block;
-  transform: scale(1.46);
-  transform-origin: center;
 }
-
-.pkg-icon--model2vec    { transform: scale(1.8); }
-.pkg-icon--semhash      { transform: scale(1.6); }
-.pkg-icon--vicinity     { transform: scale(1.8); }
-.pkg-icon--semble       { transform: scale(1.46); }
-.pkg-icon--tokenlearn   { transform: scale(1.7); }
-.pkg-icon--model2vec-rs { transform: scale(1.7); }
 
 .pkg-text {
   display: flex;
@@ -593,7 +585,7 @@ main:has(.pkg-list) .hero {
   font-size: 1.35rem;
   font-weight: 700;
   line-height: 1.1;
-  color: var(--sl-color-text);
+  color: var(--sl-color-white);
   transition: color 0.15s;
 }
 
@@ -605,7 +597,7 @@ main:has(.pkg-list) .hero {
 }
 
 [data-theme='dark'] .pkg-desc {
-  color: rgba(230, 236, 230, 0.68);
+  color: #b9b8a8;
 }
 
 .pkg-row-meta {
@@ -668,14 +660,14 @@ main:has(.pkg-list) .hero {
 
 [data-theme='dark'] .hero .sl-link-button.primary,
 [data-theme='dark'] .pkg-chip-docs {
-  background-color: #84cf8e !important;
+  background-color: var(--sl-color-accent) !important;
   color: #142216 !important;
   font-weight: 700;
 }
 
 [data-theme='dark'] .hero .sl-link-button.primary:hover,
 [data-theme='dark'] .pkg-chip-docs:hover {
-  background-color: #94d89d !important;
+  background-color: var(--sl-color-accent-high) !important;
   color: #122015 !important;
 }
 
@@ -732,11 +724,11 @@ main:has(.pkg-list) .hero {
 
 /* ─── PACKAGES OVERVIEW ─── */
 .main-frame:has(.overview-list) main > .content-panel:first-of-type h1::after {
-  content: 'Packages from Minish.';
+  content: 'Open-source libraries for fast embeddings, search and data curation.';
   display: block;
   max-width: 36rem;
   margin-top: 0.85rem;
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--sl-font);
   font-size: 1.02rem;
   font-weight: 400;
   letter-spacing: 0;
@@ -889,36 +881,10 @@ main:has(.pkg-list) .hero {
   color: rgba(220, 228, 220, 0.72);
 }
 
-[data-theme='dark'] .overview-item {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.015) 0%, rgba(255, 255, 255, 0) 100%),
-    rgba(226, 236, 228, 0.035);
-  border-color: rgba(168, 196, 174, 0.14);
-}
-
-[data-theme='dark'] .overview-item:hover {
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
-}
-
-[data-theme='dark'] .overview-tag {
-  background-color: rgba(226, 236, 228, 0.08);
-  color: rgba(236, 243, 237, 0.82);
-}
-
-[data-theme='dark'] .overview-link {
-  background-color: rgba(226, 236, 228, 0.04);
-  border-color: rgba(186, 205, 191, 0.14);
-  color: rgba(236, 243, 237, 0.92);
-}
-
-[data-theme='dark'] .overview-link-primary {
-  color: #112015;
-}
-
 @media (max-width: 720px) {
   .hero-proof {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.55rem;
   }
 
@@ -936,11 +902,6 @@ main:has(.pkg-list) .hero {
   .hero-proof-label {
     font-size: 0.68rem;
     line-height: 1.15;
-  }
-
-  .hero-proof-chip-hf {
-    grid-column: 1 / -1;
-    justify-self: start;
   }
 
   .pkg-row {
@@ -1437,4 +1398,636 @@ body:has(.posts) nav.sidebar .top-level > li:nth-child(2) .group-label .large {
     line-height: 1.65;
   }
 
+}
+
+/* ─── RETRO MINIMAL THEME (trychroma-inspired): quiet type, square corners, soft hard shadows ─── */
+:root {
+  --sl-font: 'IBM Plex Sans', sans-serif;
+  --sl-font-mono: 'JetBrains Mono', monospace;
+}
+:root[data-theme='light'] {
+  --retro-ink: #1f241f;
+  --retro-line: #d9d5c7;
+  --retro-card: #faf9f4;
+  --retro-shadow: #e0dccd;
+  --sl-color-bg: #f1efe6;
+  --sl-color-bg-sidebar: #f1efe6;
+  --sl-color-bg-nav: #f1efe6;
+  --sl-color-black: #f1efe6;
+  --sl-color-white: #1f241f;
+  --sl-color-hairline: #d9d5c7;
+  --sl-color-hairline-light: #d9d5c7;
+  --sl-color-hairline-shade: #d9d5c7;
+  --sl-color-bg-inline-code: #e6e3d7;
+  /* Viridian + rust palette (all text pairs pass WCAG AA) */
+  --sl-color-accent-low: #d9e8e0;
+  --sl-color-accent: #237a58;
+  --sl-color-accent-high: #1c6347;
+  --sl-color-text-accent: #287058;
+  --retro-rust: #c4552d;
+  --retro-rust-text: #b8472a;
+  --retro-band: #22634a;
+  --retro-band-raised: #2a6e54;
+  --retro-band-line: #4c8a70;
+  --retro-band-text: #f6f3ea;
+  --retro-band-muted: #d3e2d8;
+  --retro-band-accent: #f6bc9e;
+  --retro-band-shadow: #174a36;
+}
+:root,
+:root[data-theme='dark'] {
+  --retro-ink: #f1ead8;
+  --sl-color-white: #f1ead8;
+  --sl-color-gray-1: #e8e2d0;
+  --sl-color-gray-2: #d3cdbb;
+  --sl-color-gray-3: #a8a493;
+  --retro-line: #2f4237;
+  --retro-card: #17241d;
+  --retro-shadow: #2a4a3c;
+  --retro-fill: #1d6e4e;
+  --retro-fill-hover: #185c41;
+  --sl-color-bg: #101a15;
+  --sl-color-bg-sidebar: #101a15;
+  --sl-color-bg-nav: #101a15;
+  --sl-color-hairline: #2f4237;
+  --sl-color-hairline-shade: #2f4237;
+  --sl-color-accent-low: #1d3329;
+  --sl-color-accent: #6fb39a;
+  --sl-color-accent-high: #8cc6b0;
+  --sl-color-text-accent: #7cbca3;
+  --retro-rust: #d2693f;
+  --retro-rust-text: #dc7550;
+  --retro-band: #1f4d3a;
+  --retro-band-raised: #2a5c47;
+  --retro-band-line: #5f8a78;
+  --retro-band-text: #f1ead8;
+  --retro-band-muted: #d0dcd3;
+  --retro-band-accent: #f6bc9e;
+  --retro-band-shadow: #123024;
+}
+[data-theme='dark'] body {
+  background-image: none;
+}
+[data-theme='dark'] .pkg-icon {
+  filter: brightness(0.88);
+}
+
+*, *::before, *::after {
+  border-radius: 0 !important;
+}
+
+/* Type: JetBrains Mono for headings, nav, buttons and labels; IBM Plex Sans for body text */
+.site-title,
+.hero h1,
+.content-panel h1,
+.sl-markdown-content :is(h2, h3),
+.overview-copy h2,
+.preview h2,
+.pkg-name,
+.header .nav-link,
+.hero .sl-link-button,
+nav.sidebar .large,
+.hero-proof-value {
+  font-family: 'JetBrains Mono', monospace !important;
+  letter-spacing: -0.03em !important;
+}
+.hero h1,
+.content-panel h1 {
+  font-weight: 500 !important;
+}
+.sl-markdown-content h2,
+.overview-copy h2,
+.preview h2 {
+  font-weight: 500 !important;
+}
+main:has(.pkg-list) .hero h1,
+[data-theme='dark'] main:has(.pkg-list) .hero h1 {
+  font-family: 'Space Mono', monospace !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.04em !important;
+  font-size: clamp(2.2rem, 4.5vw, 3.25rem) !important;
+  color: var(--retro-ink) !important;
+  text-shadow: none;
+}
+main:has(.pkg-list) .hero h1::before,
+.pkg-chip,
+.overview-tag,
+.preview .metadata {
+  font-family: 'JetBrains Mono', monospace !important;
+}
+main:has(.pkg-list) .hero h1::before,
+[data-theme='dark'] main:has(.pkg-list) .hero h1::before {
+  content: '■ Minish · open-source NLP lab';
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--sl-color-gray-3);
+}
+
+/* Header: plain, dark-on-light nav, rust underline for the active page */
+header.header {
+  border-bottom-color: var(--retro-line);
+}
+.header .nav-link,
+.header .theme-toggle {
+  color: var(--retro-ink) !important;
+  font-weight: 400 !important;
+}
+.header .nav-link:hover,
+.header .nav-link.active {
+  background: none !important;
+  color: var(--retro-ink) !important;
+  box-shadow: inset 0 -2px 0 var(--retro-rust);
+}
+.header .nav-link:hover:not(.active) {
+  box-shadow: inset 0 -2px 0 var(--retro-line);
+}
+.header .social-icons a:is([href*='linkedin'], [href*='x.com'], [href$='rss.xml']) {
+  display: none;
+}
+.header .social-icons::after {
+  border-color: var(--retro-line) !important;
+}
+
+/* No overscroll bounce, so the cream page never peeks above the green header */
+html {
+  overscroll-behavior-y: none;
+}
+
+/* Header: green band on every page */
+header.header {
+  --retro-ink: var(--retro-band-text);
+  --retro-line: var(--retro-band-line);
+  --retro-card: var(--retro-band-raised);
+  background-color: var(--retro-band);
+}
+header.header [data-open-modal] kbd {
+  background: var(--retro-band);
+  color: var(--retro-band-muted);
+}
+[data-theme] .site-title,
+[data-theme] .site-title *,
+[data-theme] .header .social-icons a svg,
+[data-theme] .header starlight-theme-select button svg,
+[data-theme] .header [data-open-modal],
+[data-theme] .header [data-open-modal] * {
+  color: var(--retro-ink) !important;
+  fill: currentColor !important;
+}
+[data-theme] .header [data-open-modal] {
+  background-color: var(--retro-card) !important;
+  border: 1px solid var(--retro-line) !important;
+}
+
+/* Cards: hairline border, faint hard offset shadow */
+.pkg-row,
+.overview-item,
+.preview,
+.hero-proof-chip,
+.sl-markdown-content details {
+  border: 1px solid var(--retro-line) !important;
+  background-color: var(--retro-card) !important;
+  box-shadow: 6px 6px 0 var(--retro-shadow) !important;
+  transform: none !important;
+  transition: box-shadow 0.15s !important;
+}
+.pkg-row:hover,
+.overview-item:hover,
+.preview:hover {
+  border-color: var(--retro-ink) !important;
+  box-shadow: 6px 6px 0 var(--retro-line) !important;
+}
+.sl-markdown-content .expressive-code .frame {
+  box-shadow: none !important;
+}
+
+/* Buttons: accent primary, card secondary, square */
+.hero .sl-link-button {
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+}
+.hero .sl-link-button.primary {
+  background-color: var(--sl-color-accent) !important;
+  border-color: var(--sl-color-accent) !important;
+  color: #fff !important;
+  box-shadow: 4px 4px 0 var(--retro-ink);
+}
+.hero .sl-link-button.primary:hover {
+  background-color: var(--sl-color-accent-high) !important;
+  border-color: var(--sl-color-accent-high) !important;
+}
+[data-theme='dark'] .hero .sl-link-button.primary {
+  color: #141714 !important;
+  box-shadow: 4px 4px 0 #000;
+}
+.hero .sl-link-button.secondary {
+  background-color: var(--retro-card) !important;
+  color: var(--retro-ink) !important;
+  border-color: var(--retro-line) !important;
+}
+.hero .sl-link-button.minimal {
+  color: var(--retro-ink) !important;
+}
+.pkg-chip,
+.overview-link,
+.about-link {
+  border-color: var(--retro-line) !important;
+}
+
+/* Packages: two-column grid on wide screens */
+@media (min-width: 50rem) {
+  .pkg-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+  .pkg-list > * {
+    margin-top: 0 !important;
+  }
+  .pkg-row {
+    align-items: flex-start;
+    height: 100%;
+  }
+  .pkg-chip-label {
+    display: none;
+  }
+}
+
+/* Homepage polish: one-line tagline, joined stats bar, no duplicate Blog link */
+main:has(.pkg-list) .hero .tagline {
+  max-width: 44rem;
+}
+.hero-proof {
+  gap: 0;
+}
+.hero-proof .hero-proof-chip {
+  box-shadow: none !important;
+}
+.hero-proof .hero-proof-chip + .hero-proof-chip {
+  border-left: none !important;
+}
+.header .right-group > :has(> a[href='/blog/']) {
+  display: none;
+}
+.pkg-row {
+  padding: 1.5rem 1.75rem !important;
+}
+
+/* Hero band: hero and stats sit on one full-width green band */
+main:has(.pkg-list) .hero,
+main:has(.pkg-list) .hero-proof {
+  position: relative;
+  background: var(--retro-band);
+  /* paints the band edge to edge (and 25px up to close the gap) without clipping */
+  border-image: linear-gradient(var(--retro-band) 0 0) fill 0 / / 25px 100vmax 0;
+}
+main:has(.pkg-list) .hero > * {
+  position: relative;
+  z-index: 1;
+}
+/* Halftone texture: anchored to the band's bottom edge, rising behind the hero */
+@media (min-width: 50rem) {
+  main:has(.pkg-list) .hero-proof::after {
+    content: '';
+    position: absolute;
+    right: calc(50% - 50vw);
+    bottom: 0;
+    width: min(60vw, 900px);
+    height: 100vh;
+    background: url('/images/band-dither.svg') right bottom repeat-y;
+    opacity: 0.2;
+    pointer-events: none;
+  }
+}
+main:has(.pkg-list) .hero {
+  margin-bottom: 0 !important;
+  padding-bottom: 0.75rem !important;
+}
+main:has(.pkg-list) .hero-proof {
+  margin: 0 0 2.5rem !important;
+  padding-bottom: 2.5rem;
+}
+main:has(.pkg-list) .hero h1,
+main:has(.pkg-list) .hero h1::before,
+main:has(.pkg-list) .hero .sl-link-button.secondary,
+main:has(.pkg-list) .hero .sl-link-button.minimal,
+main:has(.pkg-list) .hero-proof-value {
+  color: var(--retro-band-text) !important;
+}
+main:has(.pkg-list) .hero .tagline,
+main:has(.pkg-list) .hero-proof-label {
+  color: var(--retro-band-muted) !important;
+}
+main:has(.pkg-list) .hero .sl-link-button.primary {
+  background-color: var(--retro-band-text) !important;
+  border-color: var(--retro-band-text) !important;
+  color: var(--retro-ink-on-band, #1f241f) !important;
+  box-shadow: 4px 4px 0 var(--retro-rust) !important;
+}
+main:has(.pkg-list) .hero .sl-link-button.secondary {
+  background-color: transparent !important;
+  border-color: var(--retro-band-line) !important;
+}
+main:has(.pkg-list) .hero .sl-link-button.minimal {
+  text-decoration: underline;
+  text-underline-offset: 6px;
+}
+main:has(.pkg-list) .hero-proof .hero-proof-chip {
+  background: var(--retro-band-raised) !important;
+  box-shadow: 5px 5px 0 var(--retro-band-shadow) !important;
+  border-color: var(--retro-band-line) !important;
+}
+main:has(.pkg-list) .hero-proof-icon {
+  background-color: var(--retro-band-accent) !important;
+}
+
+/* Rust as the small warm accent below the band */
+.pkg-chip-icon {
+  background-color: var(--retro-rust);
+}
+.pkg-row:hover {
+  border-color: var(--retro-rust) !important;
+  box-shadow: 6px 6px 0 var(--retro-rust) !important;
+}
+
+/* Section label above the package grid */
+.pkg-list::before {
+  content: '■ Packages';
+  grid-column: 1 / -1;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--retro-rust-text);
+}
+
+/* Quieter star and download counts on the cards */
+[data-theme] .pkg-chip-stat {
+  background: none;
+  border-color: transparent !important;
+  padding-inline: 0.35rem;
+}
+
+/* Header: small lowercase wordmark, compact search on the right */
+.site-title {
+  font-size: 1.2rem !important;
+  font-weight: 500 !important;
+  text-transform: lowercase;
+}
+.header [data-open-modal] {
+  min-width: 9.5rem;
+}
+
+/* Homepage: one-column hero so the headline fits on one line */
+main:has(.pkg-list) .hero {
+  grid-template-columns: 1fr !important;
+}
+
+/* Hero race card: pinned right, beside the buttons and stats, so the headline keeps its full width */
+main:has(.pkg-list) .hero > .hero-html {
+  order: 1;
+  width: 100%;
+  margin-top: 0.75rem;
+}
+@media (min-width: 64rem) {
+  main:has(.pkg-list) .hero > .hero-html {
+    display: block;
+    position: absolute;
+    right: 0;
+    bottom: -6.5rem;
+    width: 27rem;
+    z-index: 2;
+  }
+}
+.race {
+  margin: 0;
+  background: var(--retro-card);
+  border: 1px solid var(--retro-band-line);
+  box-shadow: 6px 6px 0 var(--retro-band-shadow);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--retro-ink);
+}
+.race figcaption {
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--retro-line);
+  letter-spacing: 0.04em;
+  color: var(--sl-color-gray-3);
+}
+.race-body {
+  display: grid;
+  gap: 0.85rem;
+  padding: 0.9rem 1rem;
+}
+.race-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.35rem;
+}
+.race-top [data-time] {
+  color: var(--sl-color-gray-3);
+  font-variant-numeric: tabular-nums;
+}
+.race-track {
+  height: 0.65rem;
+  background: var(--retro-line);
+}
+.race-fill {
+  height: 100%;
+  background: var(--retro-rust);
+}
+.race-top b {
+  color: var(--retro-ink);
+}
+.race-top > span:first-child {
+  color: var(--sl-color-gray-3);
+}
+.race-top [data-time].done {
+  color: var(--retro-rust-text);
+  font-weight: 600;
+}
+
+/* Dark: filled buttons and the active sidebar link use a deep green with light text, not mint */
+[data-theme='dark'] .pkg-chip-docs,
+[data-theme='dark'] .overview-link-primary,
+[data-theme='dark'] .sidebar-content a[aria-current='page'] {
+  background-color: var(--retro-fill) !important;
+  border-color: var(--retro-fill) !important;
+  color: var(--retro-ink) !important;
+  font-weight: 600;
+}
+[data-theme='dark'] .pkg-chip-docs:hover,
+[data-theme='dark'] .overview-link-primary:hover {
+  background-color: var(--retro-fill-hover) !important;
+}
+[data-theme='dark'] .overview-item {
+  background: var(--retro-card);
+  border-color: var(--retro-line);
+}
+[data-theme='dark'] .overview-tag,
+[data-theme='dark'] .overview-link:not(.overview-link-primary) {
+  background: transparent;
+  border: 1px solid var(--retro-line);
+  color: var(--retro-ink);
+}
+
+/* Phones: two-line headline, leaf-only logo, and a header menu button that sits on the green band */
+@media (max-width: 50rem) {
+  main:has(.pkg-list) .hero h1,
+  [data-theme='dark'] main:has(.pkg-list) .hero h1 {
+    font-size: clamp(1.75rem, 8.4vw, 3.25rem) !important;
+  }
+  main:has(.pkg-list) .hero-proof-icon {
+    display: none;
+  }
+  .site-title span {
+    display: none;
+  }
+  .pkg-row {
+    padding: 1.25rem !important;
+  }
+  .pkg-row-main {
+    grid-template-columns: 56px minmax(0, 1fr);
+    column-gap: 1.1rem;
+  }
+  .pkg-icon-wrap,
+  .pkg-icon {
+    width: 56px;
+    height: 56px;
+  }
+  .pkg-chip-label {
+    display: none;
+  }
+  .header [data-open-modal] {
+    min-width: 0;
+    border: none;
+    background: transparent;
+  }
+  starlight-menu-button button {
+    background: transparent !important;
+    border: 1px solid var(--retro-band-line) !important;
+    color: var(--retro-band-text) !important;
+    box-shadow: none !important;
+  }
+}
+
+/* Mobile menu: Blog is already in the header nav */
+li:has(> .sl-blog-mobile-link),
+.mobile-preferences > :has(> a[href='/blog/']) {
+  display: none;
+}
+
+/* Blog: compact cards with the date as a small mono label above the title (also on post pages) */
+.preview {
+  gap: 0.6rem !important;
+  padding: 1.5rem 1.75rem !important;
+}
+.preview > header {
+  flex-direction: column-reverse;
+  align-items: flex-start;
+  gap: 0.4rem;
+}
+.preview .metadata {
+  margin: 0;
+}
+.preview h2 {
+  margin-top: 0 !important;
+  font-size: 1.5rem !important;
+  line-height: 1.25 !important;
+}
+.preview .sl-markdown-content p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--sl-color-gray-3);
+}
+.metadata time,
+[data-theme='dark'] .preview time {
+  min-height: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--retro-rust-text);
+}
+.metadata time::before {
+  content: '■';
+  margin-right: 0.5em;
+}
+
+/* Packages overview: same layout as the homepage cards, big icon on the left, tags and links on one row */
+.overview-item {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  column-gap: 1.85rem;
+  row-gap: 0.9rem;
+  align-items: center;
+  padding: 1.5rem 1.75rem !important;
+}
+.overview-item-top {
+  display: contents;
+}
+.overview-icon {
+  grid-row: 1 / span 2;
+  width: 84px;
+  height: 84px;
+}
+.overview-item-bottom {
+  grid-column: 2;
+  flex-wrap: nowrap;
+}
+.overview-tag,
+.overview-link {
+  min-height: 1.75rem;
+}
+@media (max-width: 50rem) {
+  .overview-item {
+    grid-template-columns: 56px minmax(0, 1fr);
+    column-gap: 1.1rem;
+    padding: 1.25rem !important;
+  }
+  .overview-icon {
+    grid-row: 1;
+    width: 56px;
+    height: 56px;
+  }
+  .overview-item-bottom {
+    grid-column: 1 / -1;
+    flex-wrap: wrap;
+  }
+}
+
+/* About: rust list squares, like the homepage labels */
+.about-capabilities li::before {
+  background: var(--retro-rust);
+}
+
+/* Tables: slightly smaller, aligned digits, mono column headers */
+.sl-markdown-content table {
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+.sl-markdown-content th {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Blog sidebar: RSS lives in the footer */
+.sidebar-content li:has(> a[href$='rss.xml']) {
+  display: none;
+}
+
+/* Blog posts: smaller title so long post names don't shout; mono "On this page" like the left sidebar */
+.main-frame:has(.sl-markdown-content > .metadata) h1#_top {
+  font-size: clamp(1.9rem, 3vw, 2.4rem) !important;
+  line-height: 1.2 !important;
+}
+#starlight__on-this-page {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
 }

@@ -3,16 +3,36 @@ title: Minish
 description: Fast open-source NLP models and packages
 template: splash
 hero:
-  tagline: 'Fast open-source NLP models and packages that run on any device.'
+  title: Local intelligence for agents
+  tagline: 'Fast open-source models and tools that run on any device'
+  image:
+    html: |
+      <figure class="race" title="Times on an Apple M5 Pro laptop CPU. Wikipedia: all 6.4M English articles (~149M paragraphs) with potion-base-32M and Rust inference, extrapolated from measured throughput. Django: cold index of django/django (2,490 files, 37K chunks), median of 3 runs. Dedup: SQuAD v2 train set (130K examples), from the SemHash benchmarks.">
+        <figcaption>■ on a laptop CPU</figcaption>
+        <div class="race-body">
+          <div class="race-row" data-seconds="62.8">
+            <div class="race-top"><span><b>model2vec</b> embeds all of English Wikipedia</span><span data-time class="done">1m 02s</span></div>
+            <div class="race-track"><div class="race-fill"></div></div>
+          </div>
+          <div class="race-row" data-seconds="4.0">
+            <div class="race-top"><span><b>semble</b> indexes the entire Django codebase</span><span data-time class="done">4s</span></div>
+            <div class="race-track"><div class="race-fill"></div></div>
+          </div>
+          <div class="race-row" data-seconds="8.8">
+            <div class="race-top"><span><b>semhash</b> deduplicates all of SQuAD</span><span data-time class="done">8s</span></div>
+            <div class="race-track"><div class="race-fill"></div></div>
+          </div>
+        </div>
+      </figure>
   actions:
-    - text: Explore our Packages
+    - text: Explore packages
       link: /packages/overview/
       variant: primary
       icon: right-arrow
-    - text: Read our Blog
+    - text: Read the blog
       link: /blog/
       variant: secondary
-    - text: Try our Models
+    - text: Try our models
       link: https://huggingface.co/minishlab
       variant: minimal
       attrs:
@@ -22,7 +42,10 @@ hero:
 
 import HomepagePackageList from '../../components/home/HomepagePackageList.astro';
 import HomepageSocialProof from '../../components/home/HomepageSocialProof.astro';
+import HomepageRace from '../../components/home/HomepageRace.astro';
 
 <HomepageSocialProof />
+
+<HomepageRace />
 
 <HomepagePackageList />

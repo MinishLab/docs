@@ -16,14 +16,15 @@ export default defineConfig({
       title: 'Minish',
       components: {
         Header: './src/components/Header.astro',
+        Footer: './src/components/Footer.astro',
       },
       description: 'Fast open-source NLP models and packages',
       logo: {
-        light: '/logo/minish_logo_lighter.png',
-        dark: '/logo/minish_logo_lighter.png',
+        light: '/logo/minish_mark_cream.svg',
+        dark: '/logo/minish_mark_cream.svg',
         replacesTitle: false,
       },
-      favicon: '/logo/minish_logo.png',
+      favicon: '/logo/minish_mark_viridian.svg',
       customCss: ['./src/styles/custom.css'],
       head: [
         {
