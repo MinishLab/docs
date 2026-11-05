@@ -2,7 +2,7 @@
   // Bars fill in real time, so each clock ticks at one second per second up to the measured time
   // from the markup. Once the slowest finishes, the card holds for HOLD_MS and replays. Sources
   // live in the tooltip.
-  const HOLD_MS = 4000;
+  const HOLD_MS = 1000;
 
   const clock = (s: number) =>
     s < 60 ? `${Math.floor(s)}s` : `${Math.floor(s / 60)}m ${String(Math.floor(s % 60)).padStart(2, '0')}s`;
