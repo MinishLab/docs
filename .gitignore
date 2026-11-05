@@ -2,3 +2,4 @@
 node_modules/
 dist/
 .astro/
+playground/m2v-wasm/target/

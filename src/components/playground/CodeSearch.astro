@@ -1,0 +1,165 @@
+---
+const examples = [
+  { repo: 'pallets/flask', query: 'how are sessions signed' },
+  { repo: 'tokio-rs/axum', query: 'Router' },
+  { repo: 'minishlab/semble', query: 'reciprocal rank fusion' },
+  { repo: 'expressjs/express', query: 'parse cookies from the request' },
+];
+---
+
+<section class="pg not-content">
+  <form class="pg-form" data-form>
+    <label class="pg-repo">
+      <span>github.com/</span>
+      <input name="repo" placeholder="owner/repo" value="pallets/flask" autocomplete="off" spellcheck="false" required />
+    </label>
+    <div class="pg-search">
+      <input name="query" placeholder="Search the code, e.g. how are sessions signed" autocomplete="off" spellcheck="false" />
+      <button type="submit">Search</button>
+    </div>
+  </form>
+  <p class="pg-examples">
+    try {examples.map(({ repo, query }) => (
+      <button type="button" data-repo={repo} data-query={query}>{repo} · {query}</button>
+    ))}
+  </p>
+
+  <div class="pg-status" data-status hidden>
+    <div class="pg-track"><div class="pg-fill" data-fill></div></div>
+    <p data-status-text></p>
+  </div>
+  <ol class="pg-results" data-results></ol>
+</section>
+
+<script>
+  import type { Request, Response } from '../../playground/worker';
+
+  type Found = Extract<Response, { type: 'results' }>['results'];
+
+  const $ = <T extends HTMLElement>(selector: string) => document.querySelector<T>(selector)!;
+  const form = $<HTMLFormElement>('[data-form]');
+  const repoInput = form.elements.namedItem('repo') as HTMLInputElement;
+  const queryInput = form.elements.namedItem('query') as HTMLInputElement;
+  const button = form.querySelector('button')!;
+  const status = $('[data-status]');
+  const fill = $('[data-fill]');
+  const statusText = $('[data-status-text]');
+  const results = $<HTMLOListElement>('[data-results]');
+
+  const worker = new Worker(new URL('../../playground/worker.ts', import.meta.url), { type: 'module' });
+  const send = (message: Request) => worker.postMessage(message);
+  let indexedRepo = '';
+  let indexing = false;
+  let indexSummary = '';
+  let searchTimer: number | undefined;
+
+  const seconds = (ms: number) => `${(ms / 1000).toFixed(1)}s`;
+  const count = (n: number) => n.toLocaleString('en');
+  const STAGES = { model: 'Downloading potion-code-16M (once)', files: 'Fetching files', embed: 'Embedding chunks' };
+
+  function showStatus(text: string, progress = 1) {
+    status.hidden = false;
+    statusText.textContent = text;
+    fill.style.width = `${progress * 100}%`;
+  }
+
+  const parseRepo = (value: string) =>
+    value.trim().replace(/\.git$/, '').match(/(?:github\.com\/)?([\w.-]+\/[\w.-]+)\/?$/)?.[1];
+
+  function submit() {
+    const repo = parseRepo(repoInput.value);
+    if (!repo) return showStatus('Enter a GitHub repo as owner/repo', 0);
+    repoInput.value = repo;
+    if (repo === indexedRepo) return send({ type: 'search', query: queryInput.value });
+    if (indexing) return;
+    indexing = true;
+    button.disabled = true;
+    results.replaceChildren();
+    showStatus('Starting', 0);
+    send({ type: 'index', repo });
+  }
+
+  // Shiki loads on the first results, and each grammar on first use. Same themes as the docs' code blocks.
+  let highlighter: Promise<import('shiki').Highlighter> | undefined;
+  const LANGUAGE_ALIASES: Record<string, string> = { h: 'c', cc: 'cpp', cxx: 'cpp', hpp: 'cpp', mjs: 'js', cjs: 'js', pyi: 'py' };
+
+  async function highlight(path: string, code: string) {
+    const { createHighlighter, bundledLanguages } = await import('shiki');
+    const { createJavaScriptRegexEngine } = await import('shiki/engine/javascript');
+    highlighter ??= createHighlighter({ themes: ['night-owl-light', 'night-owl'], langs: [], engine: createJavaScriptRegexEngine() });
+    const h = await highlighter;
+    const extension = path.slice(path.lastIndexOf('.') + 1).toLowerCase();
+    const lang = LANGUAGE_ALIASES[extension] ?? extension;
+    if (!(lang in bundledLanguages)) return undefined;
+    await h.loadLanguage(lang as keyof typeof bundledLanguages);
+    return h.codeToHtml(code, { lang, themes: { light: 'night-owl-light', dark: 'night-owl' }, defaultColor: false });
+  }
+
+  function renderResults(found: Found) {
+    results.replaceChildren(
+      ...found.map(({ path, startLine, endLine, content }) => {
+        const item = document.createElement('li');
+        const link = document.createElement('a');
+        link.href = `https://github.com/${indexedRepo}/blob/HEAD/${path}#L${startLine}-L${endLine}`;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.textContent = `${path}:${startLine}-${endLine}`;
+        const code = content.replace(/\s+$/, '');
+        const pre = document.createElement('pre');
+        pre.textContent = code;
+        item.append(link, pre);
+        highlight(path, code)
+          .then((html) => {
+            if (html && item.isConnected) pre.outerHTML = html;
+          })
+          .catch(() => {});
+        return item;
+      }),
+    );
+  }
+
+  worker.onmessage = ({ data }: MessageEvent<Response>) => {
+    if (data.type === 'progress') {
+      const unit =
+        data.stage === 'model'
+          ? ` (${Math.round(data.done / 1e6)}/${Math.round(data.total / 1e6)} MB)`
+          : ` ${count(data.done)}/${count(data.total)}`;
+      showStatus(`${STAGES[data.stage]}${unit}`, data.done / data.total);
+    } else if (data.type === 'indexed') {
+      indexing = false;
+      indexedRepo = data.repo;
+      button.disabled = false;
+      const capped = data.codeFiles > data.requested ? `, capped at ${count(data.requested)} of ${count(data.codeFiles)} files` : '';
+      indexSummary = `Indexed ${count(data.files)} files (${count(data.chunks)} chunks) in ${seconds(data.indexMs)}, fetched from GitHub in ${seconds(data.fetchMs)}${capped}.`;
+      showStatus(indexSummary);
+      if (queryInput.value.trim()) send({ type: 'search', query: queryInput.value });
+      else queryInput.focus();
+    } else if (data.type === 'results') {
+      if (data.query !== queryInput.value) return;
+      showStatus(data.query.trim() ? `${indexSummary} ${data.results.length} results in ${data.ms.toFixed(1)} ms.` : indexSummary);
+      renderResults(data.results);
+    } else {
+      indexing = false;
+      button.disabled = false;
+      showStatus(data.message, 0);
+    }
+  };
+
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    submit();
+  });
+  document.querySelectorAll<HTMLButtonElement>('[data-repo]').forEach((example) =>
+    example.addEventListener('click', () => {
+      repoInput.value = example.dataset.repo!;
+      queryInput.value = example.dataset.query!;
+      submit();
+    }),
+  );
+  // Once a repo is indexed, typing searches it live.
+  queryInput.addEventListener('input', () => {
+    if (parseRepo(repoInput.value) !== indexedRepo) return;
+    clearTimeout(searchTimer);
+    searchTimer = window.setTimeout(() => send({ type: 'search', query: queryInput.value }), 80);
+  });
+</script>
