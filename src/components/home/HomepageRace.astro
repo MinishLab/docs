@@ -1,13 +1,14 @@
 <script>
   // Bars fill in real time, so each clock ticks at one second per second up to the measured time
   // from the markup. The grey strip is the transformer baseline running at its own measured speed;
-  // its result line appears when our bar finishes. Once the slowest finishes, the card holds for
-  // HOLD_MS and replays. Without motion the markup already shows the final state. Sources live in
-  // the tooltip.
+  // its percentage ticks along live and the time it still needs appears when our bar finishes.
+  // Once the slowest finishes, the card holds for HOLD_MS and replays. Without motion the markup
+  // already shows the final state. Sources live in the tooltip.
   const HOLD_MS = 2000;
 
   const clock = (s: number) =>
     s < 60 ? `${Math.floor(s)}s` : `${Math.floor(s / 60)}m ${String(Math.floor(s % 60)).padStart(2, '0')}s`;
+  const percent = (p: number) => `${p.toFixed(p < 1 ? 3 : 2)}%`;
 
   const card = document.querySelector<HTMLElement>('.race');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -18,7 +19,8 @@
       baseline: Number(row.dataset.baseline),
       fill: row.querySelector<HTMLElement>('.race-fill')!,
       ghost: row.querySelector<HTMLElement>('.race-ghost')!,
-      vs: row.querySelector<HTMLElement>('.race-vs')!,
+      pct: row.querySelector<HTMLElement>('[data-pct]')!,
+      tail: row.querySelector<HTMLElement>('.race-vs-tail')!,
       time: row.querySelector<HTMLElement>('[data-time]')!,
     }));
     card.classList.add('racing');
@@ -26,13 +28,15 @@
     let start = performance.now();
 
     const render = (now: number) => {
-      for (const { seconds, baseline, fill, ghost, vs, time } of rows) {
+      for (const { seconds, baseline, fill, ghost, pct, tail, time } of rows) {
         const progress = Math.min((now - start) / (seconds * 1000), 1);
+        const ghostPercent = ((progress * seconds) / baseline) * 100;
         fill.style.width = `${progress * 100}%`;
-        ghost.style.width = `${((progress * seconds) / baseline) * 100}%`;
+        ghost.style.width = `${ghostPercent}%`;
+        pct.textContent = percent(ghostPercent);
         time.textContent = clock(progress * seconds);
         time.classList.toggle('done', progress >= 1);
-        vs.classList.toggle('show', progress >= 1);
+        tail.classList.toggle('show', progress >= 1);
       }
       if (now - start > slowestMs + HOLD_MS) start = now;
       requestAnimationFrame(render);

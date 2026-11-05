@@ -1842,13 +1842,15 @@ main:has(.pkg-list) .hero > .hero-html {
   margin-top: 0.25rem;
   color: var(--sl-color-gray-3);
   font-variant-numeric: tabular-nums;
-  transition: opacity 0.35s;
 }
 .race-vs b {
   color: var(--sl-color-gray-2);
   font-weight: 600;
 }
-.race.racing .race-vs:not(.show) {
+.race-vs-tail {
+  transition: opacity 0.35s;
+}
+.race.racing .race-vs-tail:not(.show) {
   opacity: 0;
 }
 .race-size {
