@@ -1,7 +1,9 @@
 <script>
   // Bars fill in real time, so each clock ticks at one second per second up to the measured time
-  // from the markup. Once the slowest finishes, the card holds for HOLD_MS and replays. Sources
-  // live in the tooltip.
+  // from the markup. The grey strip is the transformer baseline running at its own measured speed;
+  // its result line appears when our bar finishes. Once the slowest finishes, the card holds for
+  // HOLD_MS and replays. Without motion the markup already shows the final state. Sources live in
+  // the tooltip.
   const HOLD_MS = 1000;
 
   const clock = (s: number) =>
@@ -13,18 +15,24 @@
   if (card && !reducedMotion) {
     const rows = [...card.querySelectorAll<HTMLElement>('.race-row')].map((row) => ({
       seconds: Number(row.dataset.seconds),
+      baseline: Number(row.dataset.baseline),
       fill: row.querySelector<HTMLElement>('.race-fill')!,
+      ghost: row.querySelector<HTMLElement>('.race-ghost')!,
+      vs: row.querySelector<HTMLElement>('.race-vs')!,
       time: row.querySelector<HTMLElement>('[data-time]')!,
     }));
+    card.classList.add('racing');
     const slowestMs = Math.max(...rows.map((r) => r.seconds)) * 1000;
     let start = performance.now();
 
     const render = (now: number) => {
-      for (const { seconds, fill, time } of rows) {
+      for (const { seconds, baseline, fill, ghost, vs, time } of rows) {
         const progress = Math.min((now - start) / (seconds * 1000), 1);
         fill.style.width = `${progress * 100}%`;
+        ghost.style.width = `${((progress * seconds) / baseline) * 100}%`;
         time.textContent = clock(progress * seconds);
         time.classList.toggle('done', progress >= 1);
+        vs.classList.toggle('show', progress >= 1);
       }
       if (now - start > slowestMs + HOLD_MS) start = now;
       requestAnimationFrame(render);
