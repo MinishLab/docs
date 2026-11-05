@@ -4,7 +4,7 @@
   // its result line appears when our bar finishes. Once the slowest finishes, the card holds for
   // HOLD_MS and replays. Without motion the markup already shows the final state. Sources live in
   // the tooltip.
-  const HOLD_MS = 1000;
+  const HOLD_MS = 2000;
 
   const clock = (s: number) =>
     s < 60 ? `${Math.floor(s)}s` : `${Math.floor(s / 60)}m ${String(Math.floor(s % 60)).padStart(2, '0')}s`;

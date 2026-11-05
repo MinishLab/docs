@@ -1863,7 +1863,7 @@ main:has(.pkg-list) .hero > .hero-html {
     margin-left: 0;
   }
   .race-size,
-  .race-vs-model {
+  .race-vs-needs {
     display: none;
   }
 }
