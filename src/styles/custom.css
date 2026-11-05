@@ -100,19 +100,6 @@ main:has(.pkg-list) .hero h1 {
   text-shadow: 0.055em 0.055em 0 rgba(34, 151, 94, 0.16);
 }
 
-main:has(.pkg-list) .hero h1::before {
-  content: 'Open-source NLP lab';
-  display: block;
-  margin-bottom: 0.55rem;
-  font-family: 'Open Sans', sans-serif;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  line-height: 1;
-  text-transform: uppercase;
-  color: rgba(34, 151, 94, 0.76);
-  text-shadow: none;
-}
 
 main:has(.pkg-list) .hero .tagline {
   max-width: 34rem;
@@ -208,9 +195,6 @@ main:has(.pkg-list) .hero {
     0 0 24px rgba(99, 207, 121, 0.05);
 }
 
-[data-theme='dark'] main:has(.pkg-list) .hero h1::before {
-  color: rgba(134, 239, 172, 0.82);
-}
 
 [data-theme='dark'] main:has(.pkg-list) .hero .tagline {
   color: rgba(230, 236, 230, 0.76) !important;
@@ -1509,18 +1493,10 @@ main:has(.pkg-list) .hero h1,
   color: var(--retro-ink) !important;
   text-shadow: none;
 }
-main:has(.pkg-list) .hero h1::before,
 .pkg-chip,
 .overview-tag,
 .preview .metadata {
   font-family: 'JetBrains Mono', monospace !important;
-}
-main:has(.pkg-list) .hero h1::before,
-[data-theme='dark'] main:has(.pkg-list) .hero h1::before {
-  content: '■ Minish · open-source NLP lab';
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  color: var(--sl-color-gray-3);
 }
 
 /* Header: plain, dark-on-light nav, rust underline for the active page */
@@ -1548,9 +1524,12 @@ header.header {
   border-color: var(--retro-line) !important;
 }
 
-/* No overscroll bounce, so the cream page never peeks above the green header */
-html {
-  overscroll-behavior-y: none;
+/* No overscroll bounce, so the cream page never peeks above the green header.
+   Mouse and trackpad only: on touch screens it would also block pull-to-refresh. */
+@media (pointer: fine) {
+  html {
+    overscroll-behavior-y: none;
+  }
 }
 
 /* Header: green band on every page */
@@ -1707,7 +1686,6 @@ main:has(.pkg-list) .hero-proof {
   padding-bottom: 2.5rem;
 }
 main:has(.pkg-list) .hero h1,
-main:has(.pkg-list) .hero h1::before,
 main:has(.pkg-list) .hero .sl-link-button.secondary,
 main:has(.pkg-list) .hero .sl-link-button.minimal,
 main:has(.pkg-list) .hero-proof-value {
@@ -1794,7 +1772,7 @@ main:has(.pkg-list) .hero > .hero-html {
     display: block;
     position: absolute;
     right: 0;
-    bottom: -6.5rem;
+    bottom: -10.75rem;
     width: 27rem;
     z-index: 2;
   }
@@ -1809,14 +1787,27 @@ main:has(.pkg-list) .hero > .hero-html {
   color: var(--retro-ink);
 }
 .race figcaption {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
   padding: 0.5rem 1rem;
   border-bottom: 1px solid var(--retro-line);
   letter-spacing: 0.04em;
   color: var(--sl-color-gray-3);
 }
+.race-legend i {
+  display: inline-block;
+  width: 0.6em;
+  height: 0.6em;
+  margin: 0 0.4em 0 0.8em;
+  background: var(--retro-rust);
+}
+.race-legend i.race-legend-ghost {
+  background: var(--sl-color-gray-3);
+}
 .race-body {
   display: grid;
-  gap: 0.85rem;
+  gap: 0.6rem;
   padding: 0.9rem 1rem;
 }
 .race-top {
@@ -1829,13 +1820,54 @@ main:has(.pkg-list) .hero > .hero-html {
   color: var(--sl-color-gray-3);
   font-variant-numeric: tabular-nums;
 }
+/* Ours on top, the transformer baseline as a thin strip along the bottom of the same track */
 .race-track {
-  height: 0.65rem;
+  position: relative;
+  height: 0.8rem;
   background: var(--retro-line);
 }
 .race-fill {
-  height: 100%;
+  height: 65%;
   background: var(--retro-rust);
+}
+.race-ghost {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  min-width: 2px;
+  height: 25%;
+  background: var(--sl-color-gray-3);
+}
+.race-vs {
+  margin-top: 0.25rem;
+  color: var(--sl-color-gray-3);
+  font-variant-numeric: tabular-nums;
+}
+.race-vs b {
+  color: var(--sl-color-gray-2);
+  font-weight: 600;
+}
+.race-vs-tail {
+  transition: opacity 0.35s;
+}
+.race.racing .race-vs-tail:not(.show) {
+  opacity: 0;
+}
+.race-size {
+  opacity: 0.75;
+}
+@media (max-width: 50rem) {
+  .race figcaption {
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+  }
+  .race-legend i:first-child {
+    margin-left: 0;
+  }
+  .race-size,
+  .race-vs-needs {
+    display: none;
+  }
 }
 .race-top b {
   color: var(--retro-ink);

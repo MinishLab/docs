@@ -229,9 +229,11 @@ export function formatCompactNumber(value: number) {
     return `${value}`;
   }
 
+  // One decimal for short values (6.4k, 2.2M), none from three digits up (386k, not 386.4k).
+  const leading = value / 1000 ** Math.floor(Math.log10(value) / 3);
   return new Intl.NumberFormat('en', {
     notation: 'compact',
-    maximumFractionDigits: 1,
+    maximumFractionDigits: leading >= 100 ? 0 : 1,
   })
     .format(value)
     .replace('K', 'k');
