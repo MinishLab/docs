@@ -1,0 +1,45 @@
+---
+import CodeSearch from './CodeSearch.astro';
+import Dedupe from './Dedupe.astro';
+import Embed from './Embed.astro';
+
+const tabs = [
+  { id: 'search', label: 'Search code' },
+  { id: 'embed', label: 'Embed' },
+  { id: 'dedupe', label: 'Dedupe' },
+];
+---
+
+<div class="pg-tabs not-content" role="tablist" aria-label="Playground">
+  {tabs.map(({ id, label }, i) => (
+    <button type="button" role="tab" id={`tab-${id}`} aria-controls={`panel-${id}`} aria-selected={i === 0 ? 'true' : 'false'} data-tab={id}>
+      {label}
+    </button>
+  ))}
+</div>
+<div role="tabpanel" id="panel-search" aria-labelledby="tab-search"><CodeSearch /></div>
+<div role="tabpanel" id="panel-embed" aria-labelledby="tab-embed" hidden><Embed /></div>
+<div role="tabpanel" id="panel-dedupe" aria-labelledby="tab-dedupe" hidden><Dedupe /></div>
+
+<script>
+  // The open tab lives in the URL hash, so /playground/#dedupe links straight to it.
+  const tabs = [...document.querySelectorAll<HTMLButtonElement>('[data-tab]')];
+
+  function show(id: string) {
+    if (!tabs.some((tab) => tab.dataset.tab === id)) id = tabs[0].dataset.tab!;
+    for (const tab of tabs) {
+      const active = tab.dataset.tab === id;
+      tab.setAttribute('aria-selected', String(active));
+      document.getElementById(`panel-${tab.dataset.tab}`)!.hidden = !active;
+    }
+  }
+
+  tabs.forEach((tab) =>
+    tab.addEventListener('click', () => {
+      history.replaceState(null, '', `#${tab.dataset.tab}`);
+      show(tab.dataset.tab!);
+    }),
+  );
+  addEventListener('hashchange', () => show(location.hash.slice(1)));
+  show(location.hash.slice(1));
+</script>

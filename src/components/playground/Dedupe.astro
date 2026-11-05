@@ -1,0 +1,100 @@
+---
+const rows = [
+  'How do I reset my password?',
+  'How can I reset my password?',
+  'What are your opening hours?',
+  'how do i reset my password',
+  'When are you open?',
+  'Can I get a refund for my order?',
+  'What time do you open on Sundays?',
+  'I want my money back for this order',
+  'Can I get a refund for my order?',
+  'Do you ship to Belgium?',
+  'Can I get a refund on my purchase?',
+  'Is shipping to Belgium available?',
+  'Where is my package?',
+  'How do I track my order?',
+];
+---
+
+<section class="pg not-content" data-dedupe>
+  <p class="pg-intro">Paste rows, one per line. semhash keeps the first of every group of near duplicates.</p>
+  <div class="pg-form">
+    <label class="pg-label">
+      <span>Rows</span>
+      <textarea name="rows" rows="10" spellcheck="false">{rows.join('\n')}</textarea>
+    </label>
+    <label class="pg-label pg-threshold">
+      <span>Threshold <b data-threshold-value>0.90</b></span>
+      <input name="threshold" type="range" min="0.5" max="1" step="0.01" value="0.9" />
+    </label>
+  </div>
+  <div class="pg-status" data-status>
+    <div class="pg-track"><div class="pg-fill" data-fill></div></div>
+    <p data-status-text>Loading potion-base-8M</p>
+  </div>
+  <ol class="pg-groups" data-groups></ol>
+</section>
+
+<script>
+  import type { Duplicate } from '../../playground/text-worker';
+  import { bindTab, request } from '../../playground/text-client';
+
+  const MAX_ROWS = 5000;
+  const root = document.querySelector<HTMLElement>('[data-dedupe]')!;
+  const rowsInput = root.querySelector<HTMLTextAreaElement>('[name=rows]')!;
+  const threshold = root.querySelector<HTMLInputElement>('[name=threshold]')!;
+  const thresholdValue = root.querySelector<HTMLElement>('[data-threshold-value]')!;
+  const fill = root.querySelector<HTMLElement>('[data-fill]')!;
+  const statusText = root.querySelector<HTMLElement>('[data-status-text]')!;
+  const groups = root.querySelector<HTMLOListElement>('[data-groups]')!;
+  const count = (n: number) => n.toLocaleString('en');
+  let latest = 0;
+
+  function line(text: string, note?: string) {
+    const item = document.createElement('li');
+    item.textContent = text;
+    if (note) {
+      const tag = document.createElement('b');
+      tag.textContent = note;
+      item.append(tag);
+    }
+    return item;
+  }
+
+  function render(rows: string[], duplicates: Duplicate[]) {
+    const byKept = Map.groupBy(duplicates, (d) => d.of);
+    groups.replaceChildren(
+      ...[...byKept].sort(([a], [b]) => a - b).map(([kept, dups]) => {
+        const group = document.createElement('li');
+        const list = document.createElement('ul');
+        list.append(
+          line(rows[kept], 'kept'),
+          ...dups.sort((a, b) => a.row - b.row).map((d) => line(rows[d.row], d.exact ? 'exact' : d.score.toFixed(2))),
+        );
+        group.append(list);
+        return group;
+      }),
+    );
+  }
+
+  async function update() {
+    thresholdValue.textContent = Number(threshold.value).toFixed(2);
+    const rows = rowsInput.value.split('\n').map((s) => s.trim()).filter(Boolean).slice(0, MAX_ROWS);
+    const id = ++latest;
+    try {
+      const result = await request({ type: 'dedupe', rows, threshold: Number(threshold.value) });
+      if (id !== latest) return;
+      fill.style.width = '100%';
+      const exact = result.duplicates.filter((d) => d.exact).length;
+      statusText.textContent =
+        `Kept ${count(result.selected.length)} of ${count(rows.length)} rows, removed ${count(result.duplicates.length)}` +
+        `${exact ? ` (${exact} exact)` : ''}. Embedding took ${result.embedMs.toFixed(1)} ms, deduplicating ${result.dedupeMs.toFixed(1)} ms.`;
+      render(rows, result.duplicates);
+    } catch (error) {
+      if (id === latest) statusText.textContent = (error as Error).message;
+    }
+  }
+
+  bindTab(root, [rowsInput, threshold], update);
+</script>

@@ -1,0 +1,74 @@
+---
+const source = 'How do I reset my password?';
+const sentences = [
+  'I forgot my login credentials',
+  'Steps to change your account password',
+  'The reset link in the email does not work',
+  'What is the weather like tomorrow?',
+  'Best pizza places in Amsterdam',
+  'How can I recover access to my account?',
+];
+---
+
+<section class="pg not-content" data-embed>
+  <p class="pg-intro">Type a sentence and compare it to others. potion-base-8M embeds every line as you type.</p>
+  <div class="pg-form">
+    <label class="pg-label">
+      <span>Source sentence</span>
+      <input name="source" value={source} autocomplete="off" spellcheck="false" />
+    </label>
+    <label class="pg-label">
+      <span>Sentences to compare, one per line</span>
+      <textarea name="sentences" rows={sentences.length} spellcheck="false">{sentences.join('\n')}</textarea>
+    </label>
+  </div>
+  <div class="pg-status" data-status>
+    <div class="pg-track"><div class="pg-fill" data-fill></div></div>
+    <p data-status-text>Loading potion-base-8M</p>
+  </div>
+  <ol class="pg-bars" data-bars></ol>
+</section>
+
+<script>
+  import { bindTab, request } from '../../playground/text-client';
+
+  const root = document.querySelector<HTMLElement>('[data-embed]')!;
+  const source = root.querySelector<HTMLInputElement>('[name=source]')!;
+  const sentences = root.querySelector<HTMLTextAreaElement>('[name=sentences]')!;
+  const fill = root.querySelector<HTMLElement>('[data-fill]')!;
+  const statusText = root.querySelector<HTMLElement>('[data-status-text]')!;
+  const bars = root.querySelector<HTMLOListElement>('[data-bars]')!;
+  let latest = 0;
+
+  async function update() {
+    const lines = sentences.value.split('\n').map((s) => s.trim()).filter(Boolean);
+    const id = ++latest;
+    try {
+      const { scores, dim, ms } = await request({ type: 'similarity', source: source.value, sentences: lines });
+      if (id !== latest) return;
+      fill.style.width = '100%';
+      statusText.textContent = `Embedded ${lines.length + 1} sentences in ${ms.toFixed(1)} ms (${dim} dimensions). Scores are cosine similarity.`;
+      const ranked = lines.map((text, i) => ({ text, score: scores[i] })).sort((a, b) => b.score - a.score);
+      bars.replaceChildren(
+        ...ranked.map(({ text, score }) => {
+          const item = document.createElement('li');
+          const label = document.createElement('span');
+          label.textContent = text;
+          const value = document.createElement('b');
+          value.textContent = score.toFixed(2);
+          const track = document.createElement('div');
+          track.className = 'pg-bar';
+          const bar = document.createElement('i');
+          bar.style.width = `${Math.max(score, 0) * 100}%`;
+          track.append(bar);
+          item.append(label, value, track);
+          return item;
+        }),
+      );
+    } catch (error) {
+      if (id === latest) statusText.textContent = (error as Error).message;
+    }
+  }
+
+  bindTab(root, [source, sentences], update);
+</script>

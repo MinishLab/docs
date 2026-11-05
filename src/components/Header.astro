@@ -10,9 +10,10 @@ const shouldRenderSearch =
 
 const path = Astro.url.pathname;
 const navItems = [
-  { label: 'Packages', href: '/packages/overview/',  active: path.startsWith('/packages') },
-  { label: 'Blog',     href: '/blog/',               active: path.startsWith('/blog') },
-  { label: 'About',    href: '/about/',              active: path.startsWith('/about') },
+  { label: 'Packages',   href: '/packages/overview/', active: path.startsWith('/packages') },
+  { label: 'Playground', href: '/playground/',        active: path.startsWith('/playground') },
+  { label: 'Blog',       href: '/blog/',              active: path.startsWith('/blog') },
+  { label: 'About',      href: '/about/',             active: path.startsWith('/about') },
 ];
 ---
 

@@ -1,7 +1,7 @@
-import init, { Model } from './wasm/m2v_wasm.js';
+import type { Model } from './wasm/m2v_wasm.js';
+import { concat, loadModel } from './model';
 import { chunkFile, Index, type Chunk } from './semble';
 
-const MODEL_URL = 'https://huggingface.co/minishlab/potion-code-16M-v2/resolve/main';
 const MAX_FILES = 3000;
 const MAX_FILE_BYTES = 1_000_000;
 const FETCH_CONCURRENCY = 64;
@@ -26,36 +26,6 @@ const extension = (path: string) => {
 const post = (message: Response) => postMessage(message);
 let model: Promise<Model> | undefined;
 let index: Index | undefined;
-
-async function cachedBytes(url: string, onBytes: (n: number) => void) {
-  const cache = await caches.open('minish-playground').catch(() => undefined);
-  let response = await cache?.match(url);
-  if (!response) {
-    response = await fetch(url);
-    if (!response.ok) throw new Error(`Could not download ${url.split('/').pop()} (${response.status})`);
-    await cache?.put(url, response.clone()).catch(() => {});
-  }
-  const reader = response.body!.getReader();
-  const parts: Uint8Array[] = [];
-  for (let r = await reader.read(); !r.done; r = await reader.read()) {
-    parts.push(r.value);
-    onBytes(r.value.length);
-  }
-  const bytes = new Uint8Array(parts.reduce((n, p) => n + p.length, 0));
-  parts.reduce((offset, p) => (bytes.set(p, offset), offset + p.length), 0);
-  return bytes;
-}
-
-async function loadModel() {
-  await init();
-  const total = 32_490_072 + 1_024_340;
-  let done = 0;
-  const onBytes = (n: number) => post({ type: 'progress', stage: 'model', done: (done += n), total });
-  const [tokenizer, weights, config] = await Promise.all(
-    ['tokenizer.json', 'model.safetensors', 'config.json'].map((f) => cachedBytes(`${MODEL_URL}/${f}`, onBytes)),
-  );
-  return new Model(tokenizer, weights, config);
-}
 
 async function fetchRepo(repo: string) {
   const treeResponse = await fetch(`https://api.github.com/repos/${repo}/git/trees/HEAD?recursive=1`);
@@ -87,7 +57,7 @@ async function fetchRepo(repo: string) {
 }
 
 async function buildIndex(repo: string) {
-  const m = await (model ??= loadModel().catch((error) => {
+  const m = await (model ??= loadModel('potion-code-16M-v2', (done, total) => post({ type: 'progress', stage: 'model', done, total })).catch((error) => {
     model = undefined;
     throw error;
   }));
@@ -102,8 +72,7 @@ async function buildIndex(repo: string) {
     vectors.push(m.encode(chunks.slice(i, i + EMBED_BATCH).map((c) => c.content)));
     post({ type: 'progress', stage: 'embed', done: Math.min(i + EMBED_BATCH, chunks.length), total: chunks.length });
   }
-  const embeddings = new Float32Array(vectors.reduce((n, v) => n + v.length, 0));
-  vectors.reduce((offset, v) => (embeddings.set(v, offset), offset + v.length), 0);
+  const embeddings = concat(vectors, Float32Array);
   const dim = chunks.length ? embeddings.length / chunks.length : 0;
   index = new Index(chunks, embeddings, dim);
   const indexMs = performance.now() - start;

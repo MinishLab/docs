@@ -8,6 +8,7 @@ const examples = [
 ---
 
 <section class="pg not-content">
+  <p class="pg-intro">Search any public GitHub repo with semble. potion-code-16M indexes it right here.</p>
   <form class="pg-form" data-form>
     <label class="pg-repo">
       <span>github.com/</span>
@@ -32,7 +33,7 @@ const examples = [
 </section>
 
 <script>
-  import type { Request, Response } from '../../playground/worker';
+  import type { Request, Response } from '../../playground/code-worker';
 
   type Found = Extract<Response, { type: 'results' }>['results'];
 
@@ -46,7 +47,7 @@ const examples = [
   const statusText = $('[data-status-text]');
   const results = $<HTMLOListElement>('[data-results]');
 
-  const worker = new Worker(new URL('../../playground/worker.ts', import.meta.url), { type: 'module' });
+  const worker = new Worker(new URL('../../playground/code-worker.ts', import.meta.url), { type: 'module' });
   const send = (message: Request) => worker.postMessage(message);
   let indexedRepo = '';
   let indexing = false;
