@@ -1,0 +1,70 @@
+---
+const links = [
+  { label: 'GitHub', href: 'https://github.com/minishlab' },
+  { label: 'Hugging Face', href: 'https://huggingface.co/minishlab' },
+  { label: 'Discord', href: 'https://discord.gg/4BDPR5nmtK' },
+  { label: 'LinkedIn', href: 'https://linkedin.com/company/minish-lab' },
+  { label: 'X', href: 'https://x.com/minishlab' },
+];
+---
+
+<div class="about not-content">
+  <section class="about-intro">
+    <p class="about-title">The local intelligence lab.</p>
+    <p>
+      We're a two-person lab: <a href="https://github.com/Pringled">Thomas van Dongen</a> and
+      <a href="https://github.com/stephantul">Stéphan Tulkens</a>. We build small open-source models and the tools
+      around them, so that embedding, search and data preprocessing run on any CPU, without a GPU or an API.
+    </p>
+  </section>
+
+  <section>
+    <h2 class="about-label">What we believe</h2>
+    <p>
+      We think that if you make models fast enough, you unlock new possibilities. A model that answers in
+      milliseconds on a laptop stops being a service you call and becomes a function you run: inside an agent loop,
+      over every row of a dataset, or on a machine with no network. Most of what people use embeddings for doesn't
+      need a large model. It needs a fast one that is good enough.
+    </p>
+  </section>
+
+  <section>
+    <h2 class="about-label">How we build</h2>
+    <dl class="about-traits">
+      <div>
+        <dt>Small</dt>
+        <dd>Our models are measured in megabytes, not gigabytes.</dd>
+      </div>
+      <div>
+        <dt>Fast</dt>
+        <dd>Everything runs on a CPU. On a laptop, model2vec embeds all of English Wikipedia in under 30 seconds, and semble indexes and searches the Django codebase in 4.</dd>
+      </div>
+      <div>
+        <dt>Open</dt>
+        <dd>Every package and model is MIT-licensed, on GitHub and Hugging Face.</dd>
+      </div>
+    </dl>
+  </section>
+
+  <section>
+    <h2 class="about-label">What we've built</h2>
+    <p>
+      We started in 2024 with <a href="https://github.com/MinishLab/model2vec">model2vec</a>, which distills a sentence
+      transformer into a static embedding model that is up to 500 times faster. Since then we've built the
+      state-of-the-art <a href="https://huggingface.co/collections/minishlab/potion">potion</a> static embedding models,
+      <a href="https://github.com/MinishLab/semble">semble</a> for agentic code search,
+      <a href="https://github.com/MinishLab/semhash">semhash</a> for data deduplication and filtering,
+      <a href="https://github.com/MinishLab/vicinity">vicinity</a> for nearest-neighbor search, and
+      <a href="https://github.com/MinishLab/model2vec-rs">model2vec-rs</a> for (even) faster model2vec inference.
+    </p>
+  </section>
+
+  <section>
+    <h2 class="about-label">Find us</h2>
+    <ul class="about-links">
+      {links.map(({ label, href }) => (
+        <li><a href={href} target="_blank" rel="noopener noreferrer">{label}</a></li>
+      ))}
+    </ul>
+  </section>
+</div>
