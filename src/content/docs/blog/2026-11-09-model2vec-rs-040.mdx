@@ -1,0 +1,69 @@
+---
+title: "model2vec-rs 0.4.0"
+date: 2026-10-14
+authors:
+  - minish
+excerpt: "We made model2vec-rs 16x faster"
+---
+
+We recently released model2vec-rs 0.4.0. In 0.3.0 the Rust crate ran at about the same speed as Python model2vec. In 0.4.0 it is about 15× faster than Python on a single thread and 25× faster on all cores, without any loss in quality. See below for the actual results. We're super happy to report that a lot of these speedups were from external contributions, which we'll highlight below.
+
+![Speed up 0.3.0 -> 0.4.0](/images/blog/post_model2vec-rs_040/speedup_old.png)
+
+## How did we get there?
+
+A lot of different bits and pieces contributed.
+
+### 1. Faster tokenization
+
+[Jack Eadie](https://jeadie.xyz/) of [Spice AI](https://spice.ai/) contributed an IDs-only WordPiece tokenizer with its own normalization and pre-tokenization. Almost all static models, except [`potion-multilingual-128M`](https://huggingface.co/minishlab/potion-multilingual-128M), use the same WordPiece tokenizer with a BERT normalizer and BERT pre-tokenizer. On its own, this made encoding about 9× faster on a single thread.
+
+[Karthik Rajgopal](https://vedicreader.com/) contributed a similar IDs-only path for Unigram, the tokenizer type potion-multilingual-128M uses. It replaces the segmentation step, while normalization and pre-tokenization still go through tokenizers, and makes encoding about 1.5× faster, again on a single thread.
+
+When loading a model, we check whether its tokenizer is a WordPiece tokenizer with exactly this normalizer and pre-tokenizer, or a Unigram tokenizer. If so, we use these IDs-only tokenizers; otherwise we fall back to the tokenizers crate.
+
+Later, we switched the WordPiece vocabulary to a trie (another ~1.25×) and added a fast path for non-ASCII text, but most of the speedup came from the first PR.
+
+### 2. Reducing load time
+
+Loading a model2vec model is already quite fast, since there is very little to load. However, models with large tokenizers can still take a while, just because of the tokenizer. For WordPiece tokenizers we added a fast load path: we read the vocabulary, normalizer, pre-tokenizer and added tokens from `tokenizer.json` and skip everything else. On [`bekko-static-embedding-v1`](https://huggingface.co/hotchpotch/bekko-static-embedding-v1), which has a vocabulary of 200k tokens, loading the tokenizer dropped from ~107 ms to ~72 ms. Together with faster f16 decoding, loading the whole model went from ~175 ms to ~116 ms, about 1.5× faster.
+
+We also experimented with memmapping the embeddings, but this had a negligible effect on load time.
+
+### 3. Parallel pooling
+
+Even though tokenization already ran in parallel, turning token IDs into a single embedding still ran on a single thread. We now pool texts in parallel, and also changed the inner loop to sum over contiguous slices so the compiler can vectorize it. That alone made encoding 1.1–1.2× faster on a single thread, and 1.9–2.5× faster on all cores.
+
+### 4. Int8 quantization
+
+In 0.3.0, we converted models that were saved in int8 to float32. In 0.4.0, we instead embrace the int8, which, in contrast to python model2vec, actually leads to smaller and equally models. Unlike model2vec int8 quantization, which is scaled globally, the scaling in model2vec-rs uses a separate scale per row, a trick which was used in the context of Static models by [Erik Kaunismäki's](https://www.erikkaum.com/) work on [`lattice`](https://huggingface.co/blog/erikkaum/lattice-blog#per-row-or-per-dim-scaling). Hence, every row in the matrix has the same dynamic range (-127, 127), but can still express norm information.
+
+### 5. Even faster pooling
+
+We also reworked how each text goes through the pipeline. In 0.3.0, a batch was first tokenized as a whole, after which the resulting lists of token IDs were pooled. Now each text is truncated, tokenized and pooled in one go, in parallel across texts. Token IDs reuse a per-thread buffer instead of getting fresh Vec per text. Similarly, truncation and unknown-token filtering happen during pooling instead of as separate passes over the IDs. For common embedding sizes (64 up to 1024), the sum is specialized on the dimension at compile time. This made encoding about 1.2× faster on all cores.
+
+### 6. Summing in blocks
+
+Essentially, pooling is adding one embedding to a running average vector. Doing that one row at a time reads and writes the whole sum once per token. In 0.4.0, we add eight rows per pass over the sum, so the sum is loaded and stored once for every eight tokens instead of once per token. We also merged the division by the token count with the norm computation, which saves another pass over the output. This gave another 1.1–1.15× on top of everything else.
+
+## Similar projects 
+
+In this section, we want to highlight several projects which also have the goal of making static models as fast as possible. The goal of this is not a comprehensive benchmark, we'll do that in a later post, just to show what else exists.
+
+### encoders/ese
+
+[Flower computer Co.](https://www.flowercomputer.com/) recently released their project [ese](https://www.flowercomputer.com/posts/fast-static-embedding/) as [Encoders](https://github.com/flowercomputers/encoders). `ese` is a static model runtime which is 2-3x faster than model2vec-rs, depending on the corpus and model. It is faster because it uses perfect hashing, and completely bakes the model into the binary. This makes it a bit less flexible than model2vec-rs, because a model change means a complete recompile. It is therefore well-suited for applications in which the model rarely changes, such as database runtimes.
+
+### icicle
+
+[`icicle`](https://github.com/capemox/icicle) by [Gautham Krithiwas](https://gauthamkrithiwas.com/) takes a similar approach to `ese`, above: it compiles a Sentence Transformers static model, weights and tokenizer included, into a single native C++ executable. It gets its speed from compiled lookup tables, a fast ASCII tokenization path and compiler-vectorized pooling, and also supports sparse, inference-free SPLADE-style query encoders. Like `ese`, changing the model requires a rebuild, and it currently only supports float32 models with WordPiece or ByteLevel BPE tokenizers. See [here](https://github.com/capemox/icicle/blob/main/docs/ICICLE_REPORT.md) for a detailed report.
+
+### Lattice
+
+As mentioned above, Erik Kaunismäki created [Lattice](https://github.com/ErikKaum/lattice), a project which focused on fast training of static models, but which also contains a rust runtime. This runtime is optimized, but does not contain a fast tokenizer, so model2vec-rs is about 2x (single threaded) to 6x (multicore) faster.
+
+## Conclusion
+
+In the near future, we'll build python bindings for model2vec-rs, and integrate this into python's model2vec. This will make the python model2vec runtime much faster, which will make everyone happy.
+
+For now, check out the project on [Github](https://github.com/MinishLab/model2vec-rs) and [crates.io](https://crates.io/).
