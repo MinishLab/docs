@@ -1,0 +1,146 @@
+---
+title: "model2vec 0.11.0"
+date: 2026-11-28
+authors:
+  - minish
+excerpt: "Model2Vec is now on rust, and 30x faster"
+---
+
+Model2Vec 0.11.0 moves inference to Rust. `StaticModel.encode` now runs on [model2vec-rs](https://github.com/MinishLab/model2vec-rs): tokenization, embedding lookup, pooling and normalization all happen in Rust. Your code doesn't need to change, and the embeddings are the same as in 0.10.0.
+
+This release also adds a way to create a model from a tokenizer, makes distillation produce `float32` models by default, and fixes a few numerical issues with `float16`.
+
+## Rust-backed inference
+
+The first time you call `encode`, a Python `StaticModel` builds a `model2vec_rs.StaticModel` from its embeddings and tokenizer, and, optionally, weights and token mapping. Every later call goes through it.
+
+```python
+from model2vec import StaticModel
+
+model = StaticModel.from_pretrained("minishlab/blink-8M")
+embeddings = model.encode(["It's dangerous to go alone!", "It's a secret to everybody."])
+```
+
+All integration tests pass, so no outputs were change, even for fresh distills.
+
+### Read-only properties
+
+`model.embedding`, `model.weights` and `model.token_mapping` are now read-only. When the dtypes match, the Python model and the Rust backend share memory, so the embeddings are only stored once. Changing them in place raises an error. To change them, assign a new array, and the backend is rebuilt on the next `encode`:
+
+```python
+model.embedding *= 10                    # ValueError: read-only
+model.embedding = model.embedding * 10   # Fine, the backend is rebuilt on the next encode
+```
+
+The same goes for the tokenizer. If you change `model.tokenizer` in place, assign it again (`model.tokenizer = model.tokenizer`) for `encode` to use the changes.
+
+The array you pass when you create a `StaticModel` stays writable and is not shared with the model.
+
+### Which dtypes to use
+
+The backend works with `float32` and `int8` embeddings. Models in other dtypes still work, but they are cast to `float32` when the backend is built, so a `float16` model keeps an extra `float32` copy of its embeddings. For `float16` models, we recommend loading them as `int8`:
+
+```python
+model = StaticModel.from_pretrained("path/to/float16-model", quantize_to="int8")
+```
+
+See [internals](docs/internals.md) for the full table.
+
+### Removed encoding arguments
+
+The Rust backend handles batching and parallelism itself, so these arguments no longer do anything:
+
+- `batch_size`
+- `show_progress_bar`
+- `use_multiprocessing`
+- `multiprocessing_threshold`
+
+`StaticModel.encode`, `StaticModel.encode_as_sequence`, and `StaticModelPipeline.predict`, `predict_proba` and `evaluate` still accept them as keyword arguments, but they raise a `DeprecationWarning`. You can remove them from your code.
+
+Because of this, `joblib` is no longer a dependency of Model2Vec.
+
+## Benchmarks
+
+### 0.10.0 vs 0.11.0
+
+We encoded the first 1,000 articles of English Wikipedia (the `20231101.en` dump) with [blink-8M](https:// huggingface.co/minishlab/blink-8M), truncated to 512 tokens, using the default settings of `encode`. Each version ran three times for at least two seconds, and we report the best run. All runs were on an Apple M3 Pro.
+
+| Version | Articles per second | Speedup |
+|:--------|--------------------:|--------:|
+| 0.10.0  |               6,196 |      1× |
+| 0.11.0  |             239,027 |     39× |
+
+### Compared to other models
+
+The table below compares blink-8M to two transformer models and to GloVe. All models encode the same 1,000 Wikipedia articles on CPU. blink-8M is truncated to 512 tokens, like [bge-base-en-v1.5](https://huggingface.co/BAAI/bge-base-en-v1.5). The sentence-transformers models are run with the default settings of `encode` in the [sentence-transformers](https://github.com/UKPLab/sentence-transformers) library.
+
+| Model                                                                                            | Param
+eters | Avg MTEB | Articles per second | blink-8M is faster by |
+|:-------------------------------------------------------------------------------------------------|------
+-----:|---------:|--------------------:|----------------------:|
+| [blink-8M](https://huggingface.co/minishlab/blink-8M)                                            |
+ 7.7M |    55.35 |             218,289 |                     — |
+| [all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)                |
+  23M |    55.93 |                 100 |                2,174× |
+| [bge-base-en-v1.5](https://huggingface.co/BAAI/bge-base-en-v1.5)                                 |
+ 109M |    60.77 |                  11 |               20,363× |
+| [GloVe 6B 300d](https://huggingface.co/sentence-transformers/average_word_embeddings_glove.6B.300d) |
+    120M |    45.82 |                 481 |                  454× |
+
+blink-8M reaches 98.96% of the average MTEB score of all-MiniLM-L6-v2, while encoding over 2,000 times as many articles per second.
+
+## Creating a model from a tokenizer
+
+Two new functions create a `StaticModel` with random embeddings. This is useful as a starting point for training a model from scratch.
+
+- `random_init` takes the name or path of a model and loads its tokenizer.
+- `init_from_tokenizer` takes a tokenizer you have already loaded.
+
+```python
+from model2vec.distill import random_init
+
+model = random_init("BAAI/bge-base-en-v1.5", dim=256)
+```
+
+The tokenizer and vocabulary go through the same preprocessing as in `distill`. Each token gets an embedding drawn from a standard normal distribution, weighted by the SIF coefficient. The `seed` argument makes this reproducible. These models have `pooling` set to the new `PoolingMode.RANDOM` in their config.
+
+## Distillation
+
+- **Distilled models are now `float32` by default.** Previously, `distill` and `distill_from_model` defaulted to `quantize_to="float16"`. `float32` is a dtype the Rust backend uses natively. As a result, distilled models are twice as large on disk as before. To get smaller models, pass `quantize_to="int8"`.
+- **`vocabulary_quantization` was removed from `distill` and `distill_from_model`.** You can still quantize the vocabulary when loading a model:
+
+  ```python
+  model = StaticModel.from_pretrained("path/to/model", vocabulary_quantization=1000)
+  ```
+
+- **Fix:** tokens that are not in the original vocabulary are now decoded before they are encoded with the original tokenizer. Previously, they could be encoded with the wrong form.
+
+## Training
+
+- **`out_dim` is assigned lazily.** The head of a trainable model is built when `out_dim` is known. For classification, similarity and regression models, `fit` sets it. Because of this, the `out_dim` argument was removed from `StaticModelForClassification` and `StaticModelForSimilarity`. A classifier that hasn't been fit yet has no head, so `predict` and `to_pipeline` raise an error before `fit`.
+
+## Other fixes
+
+- **`float16` normalization underflow:** normalizing `float16` embeddings could underflow. Normalization now happens in `float32`, in both `encode` and the ONNX export.
+- **Vocabulary quantization of `float16` models:** the norms are now computed in at least `float32`, and rows with a zero norm no longer cause division by zero.
+
+## Breaking changes
+
+In short, the changes that can break existing code:
+
+- `vocabulary_quantization` is no longer an argument of `distill` and `distill_from_model`.
+- `out_dim` is no longer an argument of `StaticModelForClassification` and `StaticModelForSimilarity`.
+- `StaticModelPipeline.predict`, `predict_proba` and `evaluate` now only accept keyword arguments after `X` (and `y`). Passing `batch_size` or `show_progress_bar` positionally raises a `TypeError`.
+- Distilled models default to `float32` instead of `float16`.
+- `model.embedding`, `model.weights` and `model.token_mapping` are read-only.
+- In the `state_dict` of a trainable model, the head's parameters are now under `_head.*` instead of `head.*`.
+
+## Dependencies
+
+- New: `model2vec-rs>=0.5.1,<0.6.0`. It ships prebuilt wheels for Linux (x86_64 and aarch64), macOS and Windows.
+- `tokenizers` now needs to be at least `0.22`.
+- `joblib` was removed.
+
+## New models
+
+The README and results now feature our new [blink](https://huggingface.co/collections/minishlab/blink) models. [blink-8M](https://huggingface.co/minishlab/blink-8M) reaches an average MTEB score of 55.35, which is 98.96% of the performance of [all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2). It also outperforms our older retrieval-specific models on retrieval. [blink-multilingual-64M](https://huggingface.co/minishlab/blink-multilingual-64M) reaches 99.10% of the performance of [LaBSE](https://huggingface.co/sentence-transformers/LaBSE), with half the parameters of [potion-multilingual-128M](https://huggingface.co/minishlab/potion-multilingual-128M). See the [results](results/README.md) for all numbers.
