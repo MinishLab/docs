@@ -93,8 +93,8 @@ blink-8M reaches 98.96% of the average MTEB score of all-MiniLM-L6-v2, while enc
 
 Two new functions create a `StaticModel` with random embeddings. This is useful as a starting point for training a model from scratch.
 
-- `random_init` takes the name or path of a model and loads its tokenizer.
-- `init_from_tokenizer` takes a tokenizer you have already loaded.
+- `random_init`: creates a random model from a model name.
+- `init_from_tokenizer`: creates a random model from an in-memory tokenizer.
 
 ```python
 from model2vec.distill import random_init
@@ -102,22 +102,22 @@ from model2vec.distill import random_init
 model = random_init("BAAI/bge-base-en-v1.5", dim=256)
 ```
 
-The tokenizer and vocabulary go through the same preprocessing as in `distill`. Each token gets an embedding drawn from a standard normal distribution, weighted by the SIF coefficient. The `seed` argument makes this reproducible. These models have `pooling` set to the new `PoolingMode.RANDOM` in their config.
+The tokenizer and vocabulary go through the same preprocessing as in `distill`. Each token gets an embedding drawn from a standard normal distribution, weighted by the SIF coefficient. These models have `pooling` set to the new `PoolingMode.RANDOM` in their config.
 
 ## Distillation
 
-- **Distilled models are now `float32` by default.** Previously, `distill` and `distill_from_model` defaulted to `quantize_to="float16"`. `float32` is a dtype the Rust backend uses natively. As a result, distilled models are twice as large on disk as before. To get smaller models, pass `quantize_to="int8"`.
+- **Distilled models are now `float32` by default.** In previous versions, `distill` and `distill_from_model` defaulted to `quantize_to="float16"`. `float32` is a dtype the Rust backend uses natively. As a result, distilled models are twice as large on disk as before. To get smaller models, pass `quantize_to="int8"`.
 - **`vocabulary_quantization` was removed from `distill` and `distill_from_model`.** You can still quantize the vocabulary when loading a model:
 
   ```python
   model = StaticModel.from_pretrained("path/to/model", vocabulary_quantization=1000)
   ```
 
-- **Fix:** tokens that are not in the original vocabulary are now decoded before they are encoded with the original tokenizer. Previously, they could be encoded with the wrong form.
+- **Fix:** tokens that are not in the original vocabulary are now decoded before they are encoded with the original tokenizer. Previously, they could be encoded with the wrong form when using a BPE tokenizer.
 
 ## Training
 
-- **`out_dim` is assigned lazily.** The head of a trainable model is built when `out_dim` is known. For classification, similarity and regression models, `fit` sets it. Because of this, the `out_dim` argument was removed from `StaticModelForClassification` and `StaticModelForSimilarity`. A classifier that hasn't been fit yet has no head, so `predict` and `to_pipeline` raise an error before `fit`.
+- **`out_dim` is assigned lazily.**  `out_dim` argument was removed from `StaticModelForClassification` and `StaticModelForSimilarity`. In previous versions, we allowed assignment, but immediately overwrote it. A classifier that hasn't been fit yet has no head, so `predict` and `to_pipeline` raise an error before `fit`.
 
 ## Other fixes
 
@@ -125,8 +125,6 @@ The tokenizer and vocabulary go through the same preprocessing as in `distill`. 
 - **Vocabulary quantization of `float16` models:** the norms are now computed in at least `float32`, and rows with a zero norm no longer cause division by zero.
 
 ## Breaking changes
-
-In short, the changes that can break existing code:
 
 - `vocabulary_quantization` is no longer an argument of `distill` and `distill_from_model`.
 - `out_dim` is no longer an argument of `StaticModelForClassification` and `StaticModelForSimilarity`.
@@ -137,7 +135,7 @@ In short, the changes that can break existing code:
 
 ## Dependencies
 
-- New: `model2vec-rs>=0.5.1,<0.6.0`. It ships prebuilt wheels for Linux (x86_64 and aarch64), macOS and Windows.
+- New: `model2vec-rs>=0.5.1,<0.6.0`. It includes prebuilt wheels for Linux (x86_64 and aarch64), macOS and Windows.
 - `tokenizers` now needs to be at least `0.22`.
 - `joblib` was removed.
 
